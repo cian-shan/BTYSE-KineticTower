@@ -18,6 +18,7 @@ game_leds = []
 
 def game_start_button_callback(self):
     global game_start
+    global p1_tot_power
     if not GPIO.input(game_start_pin):
         if not game_start:
             print("Game Start")
@@ -26,6 +27,7 @@ def game_start_button_callback(self):
         else:
             print("Game End")
             game_start = False
+            p1_tot_power = 0
 
 
 def power_gen_button_callback(self):
@@ -66,7 +68,7 @@ def game_countdown():
     np.fill([255,255,0])
     time.sleep(wait)
 
-    #GREEN
+    #GREEN 
     np.fill([0,255,0])
     time.sleep(wait)
 
@@ -76,7 +78,6 @@ def game_countdown():
 
 def power_to_led():
     print("Converting values to LEDS")
-    p1_tot_power = 0
     game_leds.clear()
     while game_start:
         pass           
@@ -108,7 +109,7 @@ def main():
 
 if __name__=="__main__":
 
-    np = neopixel.NeoPixel(pin, led_count, brightness=.3)
+    np = neopixel.NeoPixel(pin, led_count, brightness=1)
     support = LedSupport(np, led_count, pin)
     # standby_proc = Process(target=standby)
 
