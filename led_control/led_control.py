@@ -53,21 +53,22 @@ def standby():
 
 # Game Countdown function
 def game_countdown():
+    wait = 0.75
     # RED
     np.fill([255,0,0])
-    time.sleep(1)
+    time.sleep(wait)
 
     #ORANGE
     np.fill([255,50,0])
-    time.sleep(1)
+    time.sleep(wait)
 
     #YELLOW
     np.fill([255,255,0])
-    time.sleep(1)
+    time.sleep(wait)
 
     #GREEN
     np.fill([0,255,0])
-    time.sleep(1)
+    time.sleep(wait)
 
     support.clear()
 
