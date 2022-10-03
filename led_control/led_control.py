@@ -4,19 +4,24 @@ from multiprocessing import Process
 from led_support import LedSupport
 
 led_count = 20
-pin = board.D18
+pin = board.D18     #GPIO for LED control
 
 game_start_pin = 23
 power_gen_pin = 24
 
 program_exit = False
 game_start = False
+game_active = False
 
 p1_tot_power = 0
 game_leds = []
         
 
 def game_start_button_callback(self):
+    """
+    Function runs on Game Start/End button press.
+    game_start boolean is used to start/stop the game
+    """
     global game_start
     global p1_tot_power
     if not GPIO.input(game_start_pin):
@@ -31,23 +36,40 @@ def game_start_button_callback(self):
 
 
 def power_gen_button_callback(self):
+    """
+    Function Runs as Power Generation Button pressed
+    Increments LED index, LEDs are illuminated. 
+    """
     global p1_tot_power
     global game_start
-    if not GPIO.input(power_gen_pin):      
-        p1_tot_power += 1
-        try:
-            np[p1_tot_power-1] = (0,255,0)
-            print("1W generated! ",p1_tot_power )
-        except:
-            print("WINNER!! 20W produced")
-            game_start = False
-        # game_leds.append((0,255,0))
-    else:
-        print("Button Released")
+    global game_active
+    if game_active:
+        if not GPIO.input(power_gen_pin):      
+            p1_tot_power += 1
+            try:
+                # Next LED indexed as power generated
+                np[p1_tot_power-1] = (0,255,0)
+                print("1W generated! ",p1_tot_power )
+            except:
+                print("WINNER!! 20W produced")
+                for i in range(2):
+                    print("flash")
+                    np.fill([0,255,0])
+                    time.sleep(0.2)
+
+                game_start = False
+                game_active = False
+
+            # game_leds.append((0,255,0))
+        else:
+            print("Button Released")
     
 
 # Run Standby Animations
 def standby():
+    """
+    Runs standby animation
+    """
     print("Standby")
     #support.set_color(255,0,0)
     support.rainbow_cycle(5)
@@ -55,6 +77,9 @@ def standby():
 
 # Game Countdown function
 def game_countdown():
+    """
+    Runs Game countdown animation. LEDs flash during countdown
+    """
     wait = 0.75
     # RED
     np.fill([255,0,0])
@@ -74,23 +99,32 @@ def game_countdown():
 
     support.clear()
 
-    
+def run_game():
+    """
+    Waits inside function for Gameplay to finish once player generates enough power
 
-def power_to_led():
+    """
+    global p1_tot_power
+    global game_active
     print("Converting values to LEDS")
     game_leds.clear()
+    game_active = True
     while game_start:
-        pass           
+        pass
+
+    p1_tot_power = 0           
 
 # Defining main function
 def main():
+    """
+    Main loop: Game should not return from this function
+    """
     global game_start
     global keyboard_input
     global program_exit
-
     
     while not program_exit:
-
+        # Standby process allows standby to run as background process
         standby_proc = Process(target=standby)
 
         while not game_start:
@@ -100,7 +134,7 @@ def main():
 
         standby_proc.terminate()
         game_countdown()
-        power_to_led()
+        run_game()
 
         print("End Game Session")        
             
