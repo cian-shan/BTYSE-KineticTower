@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 from multiprocessing import Process
 from led_support import LedSupport
 
-led_count = 20
+led_count = 150
 pin = board.D18     #GPIO for LED control
 
 game_start_pin = 23
