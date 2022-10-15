@@ -11,7 +11,7 @@ from adafruit_led_animation.group import AnimationGroup
 from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_led_animation import helper
 
-from led_control import standby
+# from led_control import standby
 from led_power_level import PowerLevel
 
 STANDBY = 0
@@ -20,6 +20,7 @@ IN_GAME = 2
 RESULTS = 3
 FULL_BRIGHTNESS = 1 
 LED_COUNT = 256
+LED_HEIGHT = 31
    
 class KineticTowerGame:
         
@@ -52,8 +53,10 @@ class KineticTowerGame:
                 print("Game Ended with button press")
                 self.game_status = STANDBY
 
+    """
     def countdown(self, leds):
         print("Countdown Started")
+
         print("3")
         red = Solid(leds, color.RED)
         red.animate()
@@ -68,6 +71,7 @@ class KineticTowerGame:
         time.sleep(.5)
         yellow.fill((0,0,0))
         self.game_status = IN_GAME
+    """
 
     def show_results(self):
         pass
@@ -84,21 +88,22 @@ class Player():
 
     def reset(self):
         self.tot_pwr_gen = 0
+        self.player_leds.reset()
 
-    def update_leds(self):
-        """ Updates LEDs to reflect total power generated """
+    def add_leds(self, leds):
+        self.player_leds = leds
 
-        for i in range(self.tot_pwr_gen):
-            self.player_leds[0][i] = color.GREEN
+    #def update_leds(self, level):
+    #    """ Updates LEDs to reflect total power generated """
 
-    def power_gen_int(self, player):
+    def power_gen(self, player):
         """
         Function Runs as Power Generation Button pressed
         Increments LED index, LEDs are illuminated. 
         """
         if not GPIO.input(self.input_pin):
-            self.tot_pwr_gen += 5
-            self.update_leds()
+            self.tot_pwr_gen += 1
+            self.player_leds.update_level(self.tot_pwr_gen)
             print("Player: %d - Power Gen: %d " % (self.player_ID, self.tot_pwr_gen))
 
     def get_pwr_gen(self):
@@ -121,10 +126,10 @@ if __name__=="__main__":
     GPIO.setup(p2.input_pin ,GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     GPIO.add_event_detect(game.game_start_pin, GPIO.FALLING, callback= game.game_start_button_callback, bouncetime=100)
-    GPIO.add_event_detect(p1.input_pin, GPIO.FALLING, callback= p1.power_gen_int, bouncetime=200)
-    GPIO.add_event_detect(p2.input_pin, GPIO.FALLING, callback= p2.power_gen_int, bouncetime=200)
+    GPIO.add_event_detect(p1.input_pin, GPIO.FALLING, callback= p1.power_gen, bouncetime=200)
+    GPIO.add_event_detect(p2.input_pin, GPIO.FALLING, callback= p2.power_gen, bouncetime=200)
 
-    pixels = neopixel.NeoPixel(pin=board.D18, n=LED_COUNT, brightness=.1, auto_write=False)
+    pixels = neopixel.NeoPixel(pin=board.D18, n=LED_COUNT, brightness=.1, auto_write=True)
     
     p1_pixel_map = helper.PixelMap(pixels, individual_pixels=True, 
     pixel_ranges = [
@@ -165,34 +170,48 @@ if __name__=="__main__":
         (11,10,9,8),(4,5,6,7)
         ])
 
+    
 
     standby = AnimationGroup(
         #Comet(p1_pixel_map, 0.5,color.MAGENTA, 5),
         #Comet(p2_pixel_map, 0.5,color.CYAN, 5, reverse=True)
-        Rainbow(p1_pixel_map, .001, 2),
-        Rainbow(p2_pixel_map, .001, 2)
+        Rainbow(p1_pixel_map, .1, 10),
+        Rainbow(p2_pixel_map, .1, 10)
         )
-    clear_leds = AnimationGroup(Solid(p1_pixel_map, (0,0,0)), Solid(p2_pixel_map, (0,0,0)))
 
-    p1_game_leds = PowerLevel(p1_pixel_map, color.GREEN)
-    p2_game_leds = PowerLevel(p2_pixel_map, color.RED)
+    clear_leds = AnimationGroup(Solid(p1_pixel_map, color.BLACK), Solid(p2_pixel_map, color.BLACK))
+
+    p1_game_leds = PowerLevel(p1_pixel_map, color.PURPLE, max_height=LED_HEIGHT)
+    p2_game_leds = PowerLevel(p2_pixel_map, color.BLUE, max_height=LED_HEIGHT)
+
+    countdown_leds = AnimationSequence(
+        Solid(pixels, color.RED),
+        Solid(pixels, color.ORANGE),
+        Solid(pixels, color.YELLOW),
+        Solid(pixels, color.BLACK),
+    )
+    
     game_leds = AnimationGroup(p1_game_leds, p2_game_leds)
+
+    p1.add_leds(p1_game_leds)
+    p2.add_leds(p2_game_leds)
+
     while True:
 
         clear_leds.animate()
-
         
+        """
         for i in range(32):
             p1_game_leds.update_level(i)
             p2_game_leds.update_level(i)
             game_leds.animate()
             time.sleep(1)
-            
-        """
+        """ 
+        
         if game.game_status == STANDBY:
             # Set all LEDs to Standby Animation
-            standby.animate()
-            
+            #standby.animate()
+            clear_leds.animate()
             # Set players back to start 
             p1.reset()
             p2.reset()
@@ -200,18 +219,25 @@ if __name__=="__main__":
 
         elif game.game_status == COUNTDOWN:
             # Set all LEDs to Countdown
-            game.countdown()
+            print("Countdown!")
+            game.game_status = IN_GAME
+            for i in range(4):
+                countdown_leds.activate(i)
+                countdown_leds.animate()
+                time.sleep(1)
+                print(i)
+            countdown_leds.freeze()
+            pass
+            
             
         elif game.game_status == IN_GAME:
             print("In Game")
             clear_leds.animate()
-            green = Solid(p1.player_leds[0], color.GREEN)
-            green.animate()
-            green.freeze()
-            
             while game.game_status == IN_GAME:
-                # print("Blink")
-                pixels.fill((255,255,255))
+                # Waits in loop as interrupts trigger while game is played
+                game_leds.animate()
+                pass
+
         elif game.game_status == RESULTS:
             print("Show Results")
             while game.game_status == RESULTS:
@@ -219,7 +245,7 @@ if __name__=="__main__":
                 pass
         else:
             print("Exit Program - should not be reached")
-        """
+        
 
 
     
