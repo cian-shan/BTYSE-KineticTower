@@ -6,50 +6,70 @@ from led_support import LedSupport
 led_count = 150
 pin = board.D18     #GPIO for LED control
 
-game_start_pin = 23
-power_gen_pin = 24
+class LedStrip():
 
-program_exit = False
-game_start = False
-game_active = False
+    def __init__(
+        self,
+        led_count = 150,
+        led_pin = board.D18
+            ):
+        self.led_count = led_count
+        self.led_pin = led_pin
+        pass
 
-p1_tot_power = 0
-game_leds = []
+class KineticTowerGame():
+
+    def __init__(
+        self,
+        game_start_pin = 23,
+        power_gen_pin = 24,
+        program_exit = False,
+        game_start = False,
+        game_active = False,
+        p1_tot_power = 0,
+        game_leds = [],
+        ):
+        
+        self.game_start_pin = game_start_pin
+        self.power_gen_pin  = power_gen_pin 
+        self.program_exit   = program_exit  
+        self.game_start     = game_start    
+        self.game_active    = game_active   
+        self.p1_tot_power   = p1_tot_power  
+        self.game_leds      = game_leds     
+        pass
+
+
         
 
-def game_start_button_callback(self):
+def game_start_button_callback(game):
     """
     Function runs on Game Start/End button press.
     game_start boolean is used to start/stop the game
     """
-    global game_start
-    global p1_tot_power
-    if not GPIO.input(game_start_pin):
-        if not game_start:
+    if not GPIO.input(game.game_start_pin):
+        if not game.game_start:
             print("Game Start")
-            game_start = True
+            game.game_start = True
             pass
         else:
             print("Game End")
-            game_start = False
-            p1_tot_power = 0
+            game.game_start = False
+            game.p1_tot_power = 0
 
 
-def power_gen_button_callback(self):
+def power_gen_button_callback(game):
     """
     Function Runs as Power Generation Button pressed
     Increments LED index, LEDs are illuminated. 
     """
-    global p1_tot_power
-    global game_start
-    global game_active
-    if game_active:
-        if not GPIO.input(power_gen_pin):      
-            p1_tot_power += 1
+    if game.game_active:
+        if not GPIO.input(game.power_gen_pin):      
+            game.p1_tot_power += 1
             try:
                 # Next LED indexed as power generated
-                np[p1_tot_power-1] = (0,255,0)
-                print("1W generated! ",p1_tot_power )
+                np[game.p1_tot_power-1] = (0,255,0)
+                print("1W generated! ", game.p1_tot_power )
             except:
                 print("WINNER!! 20W produced")
                 for i in range(2):
@@ -57,8 +77,8 @@ def power_gen_button_callback(self):
                     np.fill([0,255,0])
                     time.sleep(0.2)
 
-                game_start = False
-                game_active = False
+                game.game_start = False
+                game.game_active = False
 
             # game_leds.append((0,255,0))
         else:
@@ -66,7 +86,7 @@ def power_gen_button_callback(self):
     
 
 # Run Standby Animations
-def standby():
+def standby(self):
     """
     Runs standby animation
     """
@@ -76,7 +96,7 @@ def standby():
     pass
 
 # Game Countdown function
-def game_countdown():
+def game_countdown(self):
     """
     Runs Game countdown animation. LEDs flash during countdown
     """
@@ -99,42 +119,39 @@ def game_countdown():
 
     support.clear()
 
-def run_game():
+def run_game(self, game):
     """
     Waits inside function for Gameplay to finish once player generates enough power
 
     """
-    global p1_tot_power
-    global game_active
+
     print("Converting values to LEDS")
-    game_leds.clear()
-    game_active = True
-    while game_start:
+    game.game_leds.clear()
+    game.game_active = True
+    while game.game_start:
         pass
 
-    p1_tot_power = 0           
+    game.p1_tot_power = 0           
 
 # Defining main function
-def main():
+def main(game):
     """
     Main loop: Game should not return from this function
     """
-    global game_start
-    global keyboard_input
-    global program_exit
     
-    while not program_exit:
+    while not game.program_exit:
         # Standby process allows standby to run as background process
         standby_proc = Process(target=standby)
 
-        while not game_start:
+        while not game.game_start:
             if not standby_proc.is_alive():
                 print("Start Standby Proc")
+                print(game)
                 standby_proc.start()
 
         standby_proc.terminate()
         game_countdown()
-        run_game()
+        run_game(game)
 
         print("End Game Session")        
             
@@ -149,14 +166,17 @@ if __name__=="__main__":
 
     support.clear()
 
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(game_start_pin ,GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(power_gen_pin ,GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    game = KineticTowerGame()
+    strip_1 = LedStrip()
 
-    GPIO.add_event_detect(game_start_pin, GPIO.FALLING, callback=game_start_button_callback, bouncetime=100)
-    GPIO.add_event_detect(power_gen_pin, GPIO.FALLING, callback=power_gen_button_callback, bouncetime=100)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(game.game_start_pin ,GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(game.power_gen_pin ,GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+    GPIO.add_event_detect(game.game_start_pin, GPIO.FALLING, callback=lambda x: game_start_button_callback(game), bouncetime=100)
+    GPIO.add_event_detect(game.power_gen_pin, GPIO.FALLING, callback=lambda x: power_gen_button_callback(game), bouncetime=100)
 
     # signal.signal(signal.SIGINT, button_press_handler)
     
 
-    main()
+    main(game)
