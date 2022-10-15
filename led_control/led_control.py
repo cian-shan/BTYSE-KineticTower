@@ -2,6 +2,7 @@ import board, neopixel, sys, time, signal
 import RPi.GPIO as GPIO
 from multiprocessing import Process
 from led_support import LedSupport
+from pixel_maps import PixelMaps
 
 led_count = 150
 pin = board.D18     #GPIO for LED control
