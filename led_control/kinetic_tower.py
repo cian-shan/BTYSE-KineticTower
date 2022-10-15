@@ -10,6 +10,8 @@ import adafruit_led_animation.color as color
 from adafruit_led_animation.group import AnimationGroup
 from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_led_animation import helper
+from multiprocessing import Process
+
 
 # from led_control import standby
 from led_power_level import PowerLevel
@@ -172,7 +174,7 @@ if __name__=="__main__":
 
     
 
-    standby = AnimationGroup(
+    standby_leds = AnimationGroup(
         #Comet(p1_pixel_map, 0.5,color.MAGENTA, 5),
         #Comet(p2_pixel_map, 0.5,color.CYAN, 5, reverse=True)
         Rainbow(p1_pixel_map, .1, 10),
@@ -212,7 +214,12 @@ if __name__=="__main__":
             # Set all LEDs to Standby Animation
             #standby.animate()
             clear_leds.animate()
-            # Set players back to start 
+            # Set players back to start
+            print("Entering Standby")
+            #standby_proc.run
+            while  game.game_status == STANDBY:
+                standby_leds.animate()
+                pass
             p1.reset()
             p2.reset()
             pass
