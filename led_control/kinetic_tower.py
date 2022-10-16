@@ -11,6 +11,7 @@ from adafruit_led_animation import helper
 from led_power_level import PowerLevel
 from player import Player
 from pixel_maps import KTPixelMap
+from adafruit_ina219 import ADCResolution, BusVoltageRange, INA219
 
 STANDBY = 0
 COUNTDOWN = 1
@@ -59,9 +60,19 @@ class KineticTowerGame:
 if __name__=="__main__":
     print("Kinetic Tower Starting")
 
+    ## Setup Power Sensors
+    i2c_bus = board.I2C()
+
+    p1_ina219 = INA219(i2c_bus)
+    p2_ina219 = INA219(i2c_bus)
+
+    p1_ina219.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+    p1_ina219.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+    p1_ina219.bus_voltage_range = BusVoltageRange.RANGE_16V
+
     # Create Strip Objects 
-    p1 = Player(player_ID= 1, input_pin=24)
-    p2 = Player(player_ID= 2, input_pin=25)
+    p1 = Player(player_ID= 1, input_pin=24, power_sensor=p1_ina219)
+    p2 = Player(player_ID= 2, input_pin=25, power_sensor=p2_ina219)
 
     game = KineticTowerGame()
 
@@ -71,8 +82,8 @@ if __name__=="__main__":
     GPIO.setup(p2.input_pin ,GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     GPIO.add_event_detect(game.game_start_pin, GPIO.FALLING, callback= game.game_start_button_callback, bouncetime=100)
-    GPIO.add_event_detect(p1.input_pin, GPIO.FALLING, callback= p1.power_gen, bouncetime=200)
-    GPIO.add_event_detect(p2.input_pin, GPIO.FALLING, callback= p2.power_gen, bouncetime=200)
+    GPIO.add_event_detect(p1.input_pin, GPIO.FALLING, callback= p1.button_power_gen, bouncetime=200)
+    GPIO.add_event_detect(p2.input_pin, GPIO.FALLING, callback= p2.button_power_gen, bouncetime=200)
 
     pixels = neopixel.NeoPixel(pin=board.D18, n=LED_COUNT, brightness=.1, auto_write=True)
     
@@ -95,11 +106,15 @@ if __name__=="__main__":
         Solid(pixels, color.YELLOW),
         Solid(pixels, color.BLACK),
     )
-    
+
+
     game_leds = AnimationGroup(p1_game_leds, p2_game_leds)
 
     p1.add_leds(p1_game_leds)
     p2.add_leds(p2_game_leds)
+
+    
+
 
     while True:
 
@@ -137,6 +152,7 @@ if __name__=="__main__":
             while game.game_status == IN_GAME:
                 # Waits in loop as interrupts trigger while game is played
                 game_leds.animate()
+                p1.ina219_pwr_gen()
                 pass
 
         elif game.game_status == RESULTS:
