@@ -3,7 +3,7 @@ from adafruit_led_animation import helper
 class KTPixelMap(helper.PixelMap):
 
     def __init__(self, strip, pixel_ranges, individual_pixels=False):
-        super.__init__(strip, pixel_ranges, individual_pixels)
+        helper.PixelMap.__init__(strip, pixel_ranges, individual_pixels)
 
     p1_pixel_map = [
         (255,254,253,252),(240,241,242,243),

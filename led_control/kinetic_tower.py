@@ -76,8 +76,8 @@ if __name__=="__main__":
 
     pixels = neopixel.NeoPixel(pin=board.D18, n=LED_COUNT, brightness=.1, auto_write=True)
     
-    p1_pixel_map = KTPixelMap(pixels, KTPixelMap.p1_pixel_map, individual_pixels=True)
-    p2_pixel_map = KTPixelMap(pixels, KTPixelMap.p2_pixel_map, individual_pixels=True)
+    p1_pixel_map = helper.PixelMap(pixels, KTPixelMap.p1_pixel_map, individual_pixels=True)
+    p2_pixel_map = helper.PixelMap(pixels, KTPixelMap.p2_pixel_map, individual_pixels=True)
 
     standby_leds = AnimationGroup(
         Rainbow(p1_pixel_map, .1, 10),
