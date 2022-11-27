@@ -19,9 +19,9 @@ STANDBY = 0
 COUNTDOWN = 1
 IN_GAME = 2
 RESULTS = 3
-FULL_BRIGHTNESS = 1 
-LED_COUNT = 256
-LED_HEIGHT = 31
+FULL_BRIGHTNESS = .1
+LED_COUNT = 1082
+LED_HEIGHT = 180
    
 class KineticTowerGame:
         
@@ -105,10 +105,10 @@ if __name__=="__main__":
     GPIO.add_event_detect(p1.input_pin, GPIO.FALLING, callback= p1.button_power_gen, bouncetime=200)
     GPIO.add_event_detect(p2.input_pin, GPIO.FALLING, callback= p2.button_power_gen, bouncetime=200)
 
-    pixels = neopixel.NeoPixel(pin=board.D18, n=LED_COUNT, brightness=.1, auto_write=True)
+    pixels = neopixel.NeoPixel(pin=board.D18, n=LED_COUNT, brightness=FULL_BRIGHTNESS, auto_write=True)
     
-    p1_pixel_map = helper.PixelMap(pixels, KTPixelMap.p1_pixel_map, individual_pixels=True)
-    p2_pixel_map = helper.PixelMap(pixels, KTPixelMap.p2_pixel_map, individual_pixels=True)
+    p1_pixel_map = helper.PixelMap(pixels, KTPixelMap.p1_pixel_map_strips, individual_pixels=True)
+    p2_pixel_map = helper.PixelMap(pixels, KTPixelMap.p2_pixel_map_strips, individual_pixels=True)
 
     standby_leds = AnimationGroup(
         Rainbow(p1_pixel_map, .1, 10),
@@ -126,6 +126,11 @@ if __name__=="__main__":
         Solid(pixels, color.YELLOW),
         Solid(pixels, color.BLACK),
     )
+
+    test_leds = AnimationGroup(
+        Blink(p1_pixel_map, speed=0.3, color=color.RED),
+        Blink(p2_pixel_map, speed=0.3, color=color.GREEN)
+        )
 
     game_leds = AnimationGroup(p1_game_leds, p2_game_leds)
 
@@ -145,6 +150,7 @@ if __name__=="__main__":
             #standby_proc.run
             while  game.game_status == STANDBY:
                 standby_leds.animate()
+                #test_leds.animate()
                 pass
             p1.reset()
             p2.reset()

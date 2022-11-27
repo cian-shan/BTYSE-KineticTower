@@ -2,16 +2,16 @@ import board, neopixel, sys, time, signal
 import RPi.GPIO as GPIO
 from multiprocessing import Process
 from led_support import LedSupport
-from pixel_maps import PixelMaps
+#from pixel_maps import PixelMaps
 
-led_count = 150
+led_count = 180
 pin = board.D18     #GPIO for LED control
 
 class LedStrip():
 
     def __init__(
         self,
-        led_count = 150,
+        led_count = 180,
         led_pin = board.D18
             ):
         self.led_count = led_count
