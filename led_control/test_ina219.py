@@ -36,8 +36,10 @@ while True:
     shunt_voltage = ina219.shunt_voltage  # voltage between V+ and V- across the shunt
     current = ina219.current  # current in mA
     power = ina219.power  # power in watts
-    load_voltage = bus_voltage + (shunt_voltage /1000) # Deviding shunt by 1000 to match units
-    energy = energy + ((load_voltage*current)/3600)
+    load_voltage = bus_voltage + (
+        shunt_voltage / 1000
+    )  # Deviding shunt by 1000 to match units
+    energy = energy + ((load_voltage * current) / 3600)
 
     # INA219 measure bus voltage on the load side. So PSU voltage = bus_voltage + shunt_voltage
     print("Voltage (VIN+) : {:6.3f}   V".format(bus_voltage + shunt_voltage))
@@ -48,7 +50,6 @@ while True:
     print("Power Register : {:6.3f}   W".format(power))
     print("Energy : {:6.3f}   Wh".format(energy))
     print("")
-    
 
     # Check internal calculations haven't overflowed (doesn't detect ADC overflows)
     if ina219.overflow:
