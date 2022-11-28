@@ -4,6 +4,12 @@ import adafruit_led_animation.color as color
 
 
 class PowerLevel(Animation):
+    """
+    This function is an abstraction of the Animation Class. 
+    It controls the level of the LEDs
+
+    """
+    
     def __init__(self, pixel_object, color, max_height, level=0, name=None):
         self._num_pixels = len(pixel_object)
         self.max_height = max_height

@@ -43,6 +43,7 @@ class KineticTowerGame:
         self.tot_energy = tot_energy
         self.winner = winner
         self.not_winner = not_winner
+        self.start_time = NONE
 
     def game_start_button_callback(self, game):
         """
@@ -94,6 +95,7 @@ if __name__ == "__main__":
 
     game = KineticTowerGame()
 
+    #  Setup for buttons
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(game.game_start_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(p1.input_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -112,10 +114,12 @@ if __name__ == "__main__":
         p2.input_pin, GPIO.FALLING, callback=p2.button_power_gen, bouncetime=200
     )
 
+    #  Setup for LEDs
     pixels = neopixel.NeoPixel(
         pin=board.D18, n=LED_COUNT, brightness=FULL_BRIGHTNESS, auto_write=True
     )
 
+    #  Create instances of LEDs for each player - Maps LEDs to each player
     p1_pixel_map = helper.PixelMap(
         pixels, KTPixelMap.p1_pixel_map_strips, individual_pixels=True
     )
@@ -123,6 +127,7 @@ if __name__ == "__main__":
         pixels, KTPixelMap.p2_pixel_map_strips, individual_pixels=True
     )
 
+    #  Create game 'Scenes' - what gets displayed on LEDs at different points in the game
     standby_leds = AnimationGroup(
         Rainbow(p1_pixel_map, 0.1, 10), Rainbow(p2_pixel_map, 0.1, 10)
     )
@@ -146,11 +151,14 @@ if __name__ == "__main__":
         Blink(p2_pixel_map, speed=0.3, color=color.GREEN),
     )
 
+    # Add the group of LEDs to the game
     game_leds = AnimationGroup(p1_game_leds, p2_game_leds)
 
     p1.add_leds(p1_game_leds, p1_pixel_map)
     p2.add_leds(p2_game_leds, p2_pixel_map)
 
+
+    # Sets the game to run indefinetly 
     while True:
 
         clear_leds.animate()
@@ -185,7 +193,6 @@ if __name__ == "__main__":
         elif game.game_status == IN_GAME:
             print("In Game")
             clear_leds.animate()
-
             while game.game_status == IN_GAME:
                 # Waits in loop as interrupts trigger while game is played
                 game_leds.animate()
