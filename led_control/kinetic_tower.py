@@ -12,17 +12,28 @@ from adafruit_led_animation import helper
 from led_power_level import PowerLevel
 from player import Player
 from pixel_maps import KTPixelMap
+from score import Score
 from adafruit_ina219 import ADCResolution, BusVoltageRange, INA219
 import subprocess
+from csv import writer
+import os 
 
 STANDBY = 0
 COUNTDOWN = 1
 IN_GAME = 2
 RESULTS = 3
-FULL_BRIGHTNESS = 0.1
-LED_COUNT = 1082
+FULL_BRIGHTNESS = 1
+LED_COUNT = 1085
 LED_HEIGHT = 180
+GAME_WIN_LEVEL = 90
 
+LINE_UP = u"\u001b[1A"
+LINE_CLEAR = u"\u001b[1K"
+RED = u"\u001b[31m"
+MAGENTA= u"\u001b[35m"
+YELLOW= u"\u001b[33m"
+GREEN = u"\u001b[32m"
+RESET = u"\u001b[0m"
 
 class KineticTowerGame:
     def __init__(
@@ -34,6 +45,7 @@ class KineticTowerGame:
         tot_energy=0,
         winner=NONE,
         not_winner=NONE,
+        game_duration=NONE
     ):
 
         self.game_start_pin = game_start_pin
@@ -43,7 +55,7 @@ class KineticTowerGame:
         self.tot_energy = tot_energy
         self.winner = winner
         self.not_winner = not_winner
-        self.start_time = NONE
+        self.game_duration = game_duration
 
     def game_start_button_callback(self, game):
         """
@@ -64,12 +76,20 @@ class KineticTowerGame:
             Solid(self.not_winner.pixel_map, color.BLACK),
         )
         print("Game over!")
-        print("Winner :", self.winner.player_ID)
-        for i in range(10):
+        print(GREEN, "Winner :", self.winner.player_ID)
+        print(GREEN, "Score: ", game.game_duration)
+        for i in range(5):
             result_leds.animate()
             time.sleep(1)
         self.game_status = STANDBY
         pass
+    def log_interaction():
+        interaction = [time.asctime()]
+        with open('interactions_kinetic_tower.csv', 'a') as file:
+
+            interations = writer(file)
+            interations.writerow(interaction)
+            file.close()
 
 
 if __name__ == "__main__":
@@ -98,21 +118,21 @@ if __name__ == "__main__":
     #  Setup for buttons
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(game.game_start_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(p1.input_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(p2.input_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setup(p1.input_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setup(p2.input_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     GPIO.add_event_detect(
         game.game_start_pin,
         GPIO.FALLING,
         callback=game.game_start_button_callback,
-        bouncetime=100,
+        bouncetime=500,
     )
-    GPIO.add_event_detect(
-        p1.input_pin, GPIO.FALLING, callback=p1.button_power_gen, bouncetime=200
-    )
-    GPIO.add_event_detect(
-        p2.input_pin, GPIO.FALLING, callback=p2.button_power_gen, bouncetime=200
-    )
+    # GPIO.add_event_detect(
+    #     p1.input_pin, GPIO.FALLING, callback=p1.button_power_gen, bouncetime=200
+    # )
+    # GPIO.add_event_detect(
+    #     p2.input_pin, GPIO.FALLING, callback=p2.button_power_gen, bouncetime=200
+    # )
 
     #  Setup for LEDs
     pixels = neopixel.NeoPixel(
@@ -136,15 +156,8 @@ if __name__ == "__main__":
         Solid(p1_pixel_map, color.BLACK), Solid(p2_pixel_map, color.BLACK)
     )
 
-    p1_game_leds = PowerLevel(p1_pixel_map, color.PURPLE, max_height=LED_HEIGHT)
+    p1_game_leds = PowerLevel(p1_pixel_map, color.ORANGE, max_height=LED_HEIGHT)
     p2_game_leds = PowerLevel(p2_pixel_map, color.BLUE, max_height=LED_HEIGHT)
-
-    countdown_leds = AnimationSequence(
-        Solid(pixels, color.RED),
-        Solid(pixels, color.ORANGE),
-        Solid(pixels, color.YELLOW),
-        Solid(pixels, color.BLACK),
-    )
 
     test_leds = AnimationGroup(
         Blink(p1_pixel_map, speed=0.3, color=color.RED),
@@ -168,6 +181,7 @@ if __name__ == "__main__":
             # standby.animate()
             clear_leds.animate()
             # Set players back to start
+            os.system('clear')
             print("Entering Standby")
             # standby_proc.run
             while game.game_status == STANDBY:
@@ -180,38 +194,68 @@ if __name__ == "__main__":
 
         elif game.game_status == COUNTDOWN:
             # Set all LEDs to Countdown
-            print("Countdown!")
+            print("COUNTDOWN!")
+            Solid(pixels , color.RED)
+            time.sleep(.5)
+            print(LINE_CLEAR, LINE_UP)
+            Solid(pixels , color.RED)
+            print(RED,"----3----", end='')
+            time.sleep(.5)
+            print(LINE_UP, LINE_CLEAR)
+            Solid(pixels , color.MAGENTA)
+            print(MAGENTA,"----2----", end='')
+            time.sleep(.5)
+            print(LINE_UP, LINE_CLEAR)
+            Solid(pixels , color.YELLOW)
+            print(YELLOW,"----1----", end='')
+            time.sleep(.5)
+            print(LINE_UP, LINE_CLEAR)
+            Solid(pixels , color.BLACK)
+            print(GREEN,"---GO!---", end='')
+            time.sleep(.5)
+            print(LINE_UP, LINE_CLEAR, RESET)
             game.game_status = IN_GAME
-            for i in range(4):
-                countdown_leds.activate(i)
-                countdown_leds.animate()
-                time.sleep(1)
-                print(i)
-            countdown_leds.freeze()
+
             pass
 
         elif game.game_status == IN_GAME:
             print("In Game")
             clear_leds.animate()
+
+            game_start_time = time.time()
+
             while game.game_status == IN_GAME:
                 # Waits in loop as interrupts trigger while game is played
                 game_leds.animate()
                 p2.ina219_pwr_gen()
                 p1.ina219_pwr_gen()
 
+                game_time = time.time() - game_start_time 
+
+                # Print Progress
+                print(f'Player 1: {p1.player_leds.level=:.2f} || Player 2: {p2.player_leds.level=:.2f}\n', end = '')
+                print(f'Game Score: {game_time=:.2f}', end='')
+
+                print(LINE_UP, LINE_UP, LINE_CLEAR)
+
                 # check for winner
-                if p2.energy_gen > LED_HEIGHT:
+                if p2.energy_gen > GAME_WIN_LEVEL:
                     game.winner = p2
                     game.not_winner = p1
                     game.tot_energy = p1.energy_gen + p2.energy_gen
                     game.game_status = RESULTS
-                elif p1.energy_gen > LED_HEIGHT:
+                    game.game_duration = game_time
+                    print(LINE_UP, LINE_UP, LINE_CLEAR)
+
+                elif p1.energy_gen > GAME_WIN_LEVEL:
                     game.winner = p1
                     game.not_winner = p2
                     game.tot_energy = p1.energy_gen + p2.energy_gen
                     game.game_status = RESULTS
+                    game.duration = game_time
+                    print(LINE_UP, LINE_UP, LINE_CLEAR)
+                
                 pass
-
         elif game.game_status == RESULTS:
             print("Show Results")
             while game.game_status == RESULTS:

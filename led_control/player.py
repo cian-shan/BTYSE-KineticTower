@@ -11,6 +11,7 @@ class Player:
         self.player_leds = None
         self.energy_gen = energy_gen
         self.power_sensor = power_sensor
+        self.game_start_time = None
 
     def reset(self):
         self.energy_gen = 0
@@ -31,7 +32,7 @@ class Player:
         if not GPIO.input(self.input_pin):
             self.energy_gen += 1
             self.player_leds.update_level(self.energy_gen)
-            print("Player: %d - Power Gen: %d " % (self.player_ID, self.energy_gen))
+            # print("Player: %d - Power Gen: %d " % (self.player_ID, self.energy_gen))
 
     def ina219_pwr_gen(self):
         bus_voltage = self.power_sensor.bus_voltage  # voltage on V- (load side)
@@ -40,17 +41,23 @@ class Player:
         )  # voltage between V+ and V- across the shunt
         current = self.power_sensor.current  # current in mA
         power = self.power_sensor.power  # power in watts
-        print("Power Read: ", power)
+        # print("Power Read: ", power)
         load_voltage = bus_voltage + (
             shunt_voltage / 1000
         )  # Deviding shunt by 1000 to match units
         self.energy_gen = self.energy_gen + (
             (load_voltage * current) / 3600
         )  # Calculate cumulative energy in Wh
-        self.player_leds.update_level(int(self.energy_gen))
-        print("Player: %d - Total Energy: %d " % (self.player_ID, self.energy_gen))
+        self.player_leds.update_level(int(self.energy_gen) * 2)
+        # print("Player: %d - Total Energy: %d " % (self.player_ID, self.energy_gen))
         # time.sleep(.5)
         pass
 
     def get_pwr_gen(self):
         return self.energy_gen
+
+    def start_game_time(self):
+        self.game_start_time = time.time()
+
+    def get_game_duration(self):
+        return time.time() - self.game_start_time
