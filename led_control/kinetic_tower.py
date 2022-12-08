@@ -183,7 +183,6 @@ if __name__ == "__main__":
             # Set players back to start
             os.system('clear')
             print("Entering Standby")
-            # standby_proc.run
             while game.game_status == STANDBY:
                 standby_leds.animate()
                 # test_leds.animate()
@@ -220,8 +219,8 @@ if __name__ == "__main__":
 
         elif game.game_status == IN_GAME:
             print("In Game")
+            KineticTowerGame.log_interaction()
             clear_leds.animate()
-
             game_start_time = time.time()
 
             while game.game_status == IN_GAME:
