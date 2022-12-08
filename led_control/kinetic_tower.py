@@ -15,8 +15,14 @@ from pixel_maps import KTPixelMap
 from score import Score
 from adafruit_ina219 import ADCResolution, BusVoltageRange, INA219
 import subprocess
+import sys
+from CountDown_GUI import Ui_Form
+from GameRunningGui import GameUi_Form
+from Idle_LeaderboardGUI import Ui_MainWindow
+from PyQt5 import QtGui, QtWidgets
 from csv import writer
 import os 
+
 
 STANDBY = 0
 COUNTDOWN = 1
@@ -93,6 +99,17 @@ class KineticTowerGame:
 
 
 if __name__ == "__main__":
+    app = QtWidgets.QApplication([])
+    Countwindow = QtWidgets.QWidget()
+    ui = Ui_Form()
+    ui.setupUi(Countwindow)
+    Countwindow.show()
+
+    for i in range(6):
+        ui.lcdNumber.display(i)
+        time.sleep(0.5)
+    Countwindow.close()
+    '''
     print("Kinetic Tower Starting")
 
     ## Setup Power Sensors
@@ -169,7 +186,21 @@ if __name__ == "__main__":
 
     p1.add_leds(p1_game_leds, p1_pixel_map)
     p2.add_leds(p2_game_leds, p2_pixel_map)
+    '''
+ 
 
+    
+
+    #countdown GUI setup
+ 
+'''
+    #GameRunningGUI setup
+    Gamewindow = QtWidgets.QWidget()
+    GameRunUI = GameUi_Form()
+    GameRunUI.setupUi(Gamewindow)
+
+    #Idle screen
+    # IdleWindow = QtGui.QMainwindow
 
     # Sets the game to run indefinetly 
     while True:
@@ -181,7 +212,7 @@ if __name__ == "__main__":
             # standby.animate()
             clear_leds.animate()
             # Set players back to start
-            os.system('clear')
+            # os.system('clear')
             print("Entering Standby")
             # standby_proc.run
             while game.game_status == STANDBY:
@@ -193,38 +224,50 @@ if __name__ == "__main__":
             pass
 
         elif game.game_status == COUNTDOWN:
+
             # Set all LEDs to Countdown
             print("COUNTDOWN!")
-            Solid(pixels , color.RED)
-            time.sleep(.5)
-            print(LINE_CLEAR, LINE_UP)
-            Solid(pixels , color.RED)
+            countdown_leds = Solid(pixels , color.RED)
+            countdown_leds.animate()
+            Countwindow.show()
+            ui.lcdNumber.display(3)
+            Countwindow.repaint()
             print(RED,"----3----", end='')
             time.sleep(.5)
             print(LINE_UP, LINE_CLEAR)
-            Solid(pixels , color.MAGENTA)
+            countdown_leds = Solid(pixels , color.ORANGE)
+            countdown_leds.animate()
+            ui.lcdNumber.display(2)
+            Countwindow.repaint()
             print(MAGENTA,"----2----", end='')
             time.sleep(.5)
             print(LINE_UP, LINE_CLEAR)
-            Solid(pixels , color.YELLOW)
+            countdown_leds = Solid(pixels , color.YELLOW)
+            countdown_leds.animate()
+            ui.lcdNumber.display(1)
+            Countwindow.repaint()
             print(YELLOW,"----1----", end='')
             time.sleep(.5)
             print(LINE_UP, LINE_CLEAR)
-            Solid(pixels , color.BLACK)
+            countdown_leds = Solid(pixels , color.BLACK)
+            countdown_leds.animate()
             print(GREEN,"---GO!---", end='')
             time.sleep(.5)
+            Countwindow.close()
             print(LINE_UP, LINE_CLEAR, RESET)
+            sys.exit(app.exec_())
             game.game_status = IN_GAME
-
             pass
 
         elif game.game_status == IN_GAME:
+            
             print("In Game")
             clear_leds.animate()
-
+            
             game_start_time = time.time()
 
             while game.game_status == IN_GAME:
+                #Gamewindow.show()
                 # Waits in loop as interrupts trigger while game is played
                 game_leds.animate()
                 p2.ina219_pwr_gen()
@@ -255,6 +298,7 @@ if __name__ == "__main__":
                     game.duration = game_time
                     print(LINE_UP, LINE_UP, LINE_CLEAR)
                 
+                #Gamewindow.close()
                 pass
         elif game.game_status == RESULTS:
             print("Show Results")
@@ -263,3 +307,4 @@ if __name__ == "__main__":
                 pass
         else:
             print("Exit Program - should not be reached")
+    '''        
