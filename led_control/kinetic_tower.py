@@ -25,7 +25,7 @@ RESULTS = 3
 FULL_BRIGHTNESS = 1
 LED_COUNT = 1085
 LED_HEIGHT = 180
-GAME_WIN_LEVEL = 90
+GAME_WIN_LEVEL = 9
 
 LINE_UP = u"\u001b[1A"
 LINE_CLEAR = u"\u001b[1K"
@@ -110,8 +110,8 @@ if __name__ == "__main__":
     p2_ina219.bus_voltage_range = BusVoltageRange.RANGE_16V
 
     # Create Strip Objects
-    p1 = Player(player_ID=1, input_pin=24, power_sensor=p1_ina219)
-    p2 = Player(player_ID=2, input_pin=25, power_sensor=p2_ina219)
+    p2 = Player(player_ID=1, input_pin=24, power_sensor=p1_ina219)
+    p1 = Player(player_ID=2, input_pin=25, power_sensor=p2_ina219)
 
     game = KineticTowerGame()
 
@@ -170,6 +170,13 @@ if __name__ == "__main__":
     p1.add_leds(p1_game_leds, p1_pixel_map)
     p2.add_leds(p2_game_leds, p2_pixel_map)
 
+    countdown_leds = AnimationSequence(
+        Solid(pixels, color.RED),
+        Solid(pixels, color.ORANGE),
+        Solid(pixels, color.GREEN),
+        Solid(pixels, color.BLACK),
+    )
+
 
     # Sets the game to run indefinetly 
     while True:
@@ -193,28 +200,15 @@ if __name__ == "__main__":
 
         elif game.game_status == COUNTDOWN:
             # Set all LEDs to Countdown
-            print("COUNTDOWN!")
-            Solid(pixels , color.RED)
-            time.sleep(.5)
-            print(LINE_CLEAR, LINE_UP)
-            Solid(pixels , color.RED)
-            print(RED,"----3----", end='')
-            time.sleep(.5)
-            print(LINE_UP, LINE_CLEAR)
-            Solid(pixels , color.MAGENTA)
-            print(MAGENTA,"----2----", end='')
-            time.sleep(.5)
-            print(LINE_UP, LINE_CLEAR)
-            Solid(pixels , color.YELLOW)
-            print(YELLOW,"----1----", end='')
-            time.sleep(.5)
-            print(LINE_UP, LINE_CLEAR)
-            Solid(pixels , color.BLACK)
-            print(GREEN,"---GO!---", end='')
-            time.sleep(.5)
-            print(LINE_UP, LINE_CLEAR, RESET)
+            print("Countdown!")
             game.game_status = IN_GAME
-
+            for i in range(4):
+                countdown_leds.activate(i)
+                countdown_leds.animate()
+                time.sleep(1)
+                print(i)
+            countdown_leds.freeze()
+            pass
             pass
 
         elif game.game_status == IN_GAME:
@@ -238,7 +232,8 @@ if __name__ == "__main__":
                 print(LINE_UP, LINE_UP, LINE_CLEAR)
 
                 # check for winner
-                if p2.energy_gen > GAME_WIN_LEVEL:
+                # Somewhere the player have gotten mixed up, this will print the correct winner however
+                if p2.energy_gen > GAME_WIN_LEVEL: 
                     game.winner = p2
                     game.not_winner = p1
                     game.tot_energy = p1.energy_gen + p2.energy_gen
