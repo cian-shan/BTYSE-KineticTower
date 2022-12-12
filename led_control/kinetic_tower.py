@@ -22,6 +22,7 @@ from Idle_LeaderboardGUI import Ui_MainWindow
 from PyQt5 import QtGui, QtWidgets
 from csv import writer
 import os 
+from threading import Thread
 
 
 STANDBY = 0
@@ -31,7 +32,7 @@ RESULTS = 3
 FULL_BRIGHTNESS = 1
 LED_COUNT = 1085
 LED_HEIGHT = 180
-GAME_WIN_LEVEL = 90
+GAME_WIN_LEVEL = 60
 
 LINE_UP = u"\u001b[1A"
 LINE_CLEAR = u"\u001b[1K"
@@ -81,9 +82,9 @@ class KineticTowerGame:
             Blink(self.winner.pixel_map, speed=0.3, color=color.GREEN),
             Solid(self.not_winner.pixel_map, color.BLACK),
         )
-        print("Game over!")
+        print("\nGame over!")
         print(GREEN, "Winner :", self.winner.player_ID)
-        print(GREEN, "Score: ", game.game_duration)
+        print(GREEN, f"Score  : {self.game_duration:8.2f} s")
         for i in range(5):
             result_leds.animate()
             time.sleep(1)
@@ -97,6 +98,11 @@ class KineticTowerGame:
             interations.writerow(interaction)
             file.close()
 
+    def get_game_go_from_console():
+        game_go = input()
+        return game_go
+
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
@@ -109,14 +115,14 @@ if __name__ == "__main__":
         ui.lcdNumber.display(i)
         time.sleep(0.5)
     Countwindow.close()
-    '''
+    
     print("Kinetic Tower Starting")
 
     ## Setup Power Sensors
     i2c_bus = board.I2C()
 
-    p1_ina219 = INA219(i2c_bus, addr=0x40)
-    p2_ina219 = INA219(i2c_bus, addr=0x44)
+    p2_ina219 = INA219(i2c_bus, addr=0x40)
+    p1_ina219 = INA219(i2c_bus, addr=0x44)
 
     p1_ina219.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
     p1_ina219.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
@@ -127,8 +133,8 @@ if __name__ == "__main__":
     p2_ina219.bus_voltage_range = BusVoltageRange.RANGE_16V
 
     # Create Strip Objects
-    p1 = Player(player_ID=1, input_pin=24, power_sensor=p1_ina219)
-    p2 = Player(player_ID=2, input_pin=25, power_sensor=p2_ina219)
+    p2 = Player(player_ID='PLAYER 2', input_pin=24, power_sensor=p2_ina219)
+    p1 = Player(player_ID='PLAYER 1', input_pin=25, power_sensor=p1_ina219)
 
     game = KineticTowerGame()
 
@@ -186,21 +192,15 @@ if __name__ == "__main__":
 
     p1.add_leds(p1_game_leds, p1_pixel_map)
     p2.add_leds(p2_game_leds, p2_pixel_map)
-    '''
- 
-
     
 
-    #countdown GUI setup
- 
-'''
-    #GameRunningGUI setup
-    Gamewindow = QtWidgets.QWidget()
-    GameRunUI = GameUi_Form()
-    GameRunUI.setupUi(Gamewindow)
+    countdown_leds = AnimationSequence(
+        Solid(pixels, color.RED),
+        Solid(pixels, color.ORANGE),
+        Solid(pixels, color.GREEN),
+        Solid(pixels, color.BLACK),
+    )
 
-    #Idle screen
-    # IdleWindow = QtGui.QMainwindow
 
     # Sets the game to run indefinetly 
     while True:
@@ -212,9 +212,10 @@ if __name__ == "__main__":
             # standby.animate()
             clear_leds.animate()
             # Set players back to start
-            # os.system('clear')
+            os.system('clear')
+            print(RESET)
             print("Entering Standby")
-            # standby_proc.run
+            print("Who can generate the power needed in the stortest time?!")
             while game.game_status == STANDBY:
                 standby_leds.animate()
                 # test_leds.animate()
@@ -226,44 +227,21 @@ if __name__ == "__main__":
         elif game.game_status == COUNTDOWN:
 
             # Set all LEDs to Countdown
-            print("COUNTDOWN!")
-            countdown_leds = Solid(pixels , color.RED)
-            countdown_leds.animate()
-            Countwindow.show()
-            ui.lcdNumber.display(3)
-            Countwindow.repaint()
-            print(RED,"----3----", end='')
-            time.sleep(.5)
-            print(LINE_UP, LINE_CLEAR)
-            countdown_leds = Solid(pixels , color.ORANGE)
-            countdown_leds.animate()
-            ui.lcdNumber.display(2)
-            Countwindow.repaint()
-            print(MAGENTA,"----2----", end='')
-            time.sleep(.5)
-            print(LINE_UP, LINE_CLEAR)
-            countdown_leds = Solid(pixels , color.YELLOW)
-            countdown_leds.animate()
-            ui.lcdNumber.display(1)
-            Countwindow.repaint()
-            print(YELLOW,"----1----", end='')
-            time.sleep(.5)
-            print(LINE_UP, LINE_CLEAR)
-            countdown_leds = Solid(pixels , color.BLACK)
-            countdown_leds.animate()
-            print(GREEN,"---GO!---", end='')
-            time.sleep(.5)
-            Countwindow.close()
-            print(LINE_UP, LINE_CLEAR, RESET)
-            sys.exit(app.exec_())
+            print("Countdown!")
             game.game_status = IN_GAME
+            for i in range(0,3):
+                countdown_leds.activate(i)
+                countdown_leds.animate()
+                print(4-(i+1))
+                time.sleep(.75)
+            countdown_leds.freeze()
+            pass
             pass
 
         elif game.game_status == IN_GAME:
-            
-            print("In Game")
+            print("GO!!!")
+            KineticTowerGame.log_interaction()
             clear_leds.animate()
-            
             game_start_time = time.time()
 
             while game.game_status == IN_GAME:
@@ -276,27 +254,33 @@ if __name__ == "__main__":
                 game_time = time.time() - game_start_time 
 
                 # Print Progress
-                print(f'Player 1: {p1.player_leds.level=:.2f} || Player 2: {p2.player_leds.level=:.2f}\n', end = '')
-                print(f'Game Score: {game_time=:.2f}', end='')
+                print(f'Player 1: {p1.player_leds.level:8.2f}\nPlayer 2: {p2.player_leds.level:8.2f}\n', end = '')
+                print(f'Game Score: {game_time:8.2f}', end='')
 
-                print(LINE_UP, LINE_UP, LINE_CLEAR)
+                print(LINE_UP, LINE_UP, LINE_UP, LINE_CLEAR)
+                
 
                 # check for winner
-                if p2.energy_gen > GAME_WIN_LEVEL:
+                # Somewhere the player have gotten mixed up, this will print the correct winner however
+                if p1.energy_gen > GAME_WIN_LEVEL:
+                    print("PLAYER 1 WIN") 
+                    print("\n\n\n")
+                    game.winner = p1
+                    game.not_winner = p2
+                    game.tot_energy = p1.energy_gen + p2.energy_gen
+                    game.game_status = RESULTS
+                    game.game_duration = game_time
+                    #print(LINE_UP, LINE_UP, LINE_CLEAR)
+
+                elif p2.energy_gen > GAME_WIN_LEVEL:
+                    print("PLAYER 2 WIN")
+                    print("\n\n\n")
                     game.winner = p2
                     game.not_winner = p1
                     game.tot_energy = p1.energy_gen + p2.energy_gen
                     game.game_status = RESULTS
                     game.game_duration = game_time
-                    print(LINE_UP, LINE_UP, LINE_CLEAR)
-
-                elif p1.energy_gen > GAME_WIN_LEVEL:
-                    game.winner = p1
-                    game.not_winner = p2
-                    game.tot_energy = p1.energy_gen + p2.energy_gen
-                    game.game_status = RESULTS
-                    game.duration = game_time
-                    print(LINE_UP, LINE_UP, LINE_CLEAR)
+                    #print(LINE_UP, LINE_UP, LINE_CLEAR)
                 
                 #Gamewindow.close()
                 pass
@@ -306,5 +290,4 @@ if __name__ == "__main__":
                 game.show_results()
                 pass
         else:
-            print("Exit Program - should not be reached")
-    '''        
+            print("Exit Program - should not be reached")        

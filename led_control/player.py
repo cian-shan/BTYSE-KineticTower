@@ -48,7 +48,7 @@ class Player:
         self.energy_gen = self.energy_gen + (
             (load_voltage * current) / 3600
         )  # Calculate cumulative energy in Wh
-        self.player_leds.update_level(int(self.energy_gen) * 2)
+        self.player_leds.update_level(int(self.energy_gen)*3)
         # print("Player: %d - Total Energy: %d " % (self.player_ID, self.energy_gen))
         # time.sleep(.5)
         pass
