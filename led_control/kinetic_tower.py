@@ -196,8 +196,8 @@ if __name__ == "__main__":
             # Set players back to start
             os.system('clear')
             print(RESET)
-            print("Entering Standby")
-            print("Who can generate the power needed in the stortest time?!")
+            #print("Entering Standby")
+            print("Fill the tower with power in the shortest time!")
             while game.game_status == STANDBY:
                 standby_leds.animate()
                 # test_leds.animate()
