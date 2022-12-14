@@ -66,7 +66,8 @@ class KineticTowerGame:
         if not GPIO.input(self.game_start_pin):
             if self.game_status == STANDBY:
                 print("Game Start Button Pressed")
-                self.game_status = COUNTDOWN
+                #self.game_status = COUNTDOWN
+                self.game_status = IN_GAME
             else:
                 print("Game Ended with button press")
                 self.game_status = STANDBY
@@ -206,18 +207,18 @@ if __name__ == "__main__":
             p2.reset()
             pass
 
-        elif game.game_status == COUNTDOWN:
-            # Set all LEDs to Countdown
-            print("Countdown!")
-            game.game_status = IN_GAME
-            for i in range(0,3):
-                countdown_leds.activate(i)
-                countdown_leds.animate()
-                print(4-(i+1))
-                time.sleep(.75)
-            countdown_leds.freeze()
-            pass
-            pass
+        # elif game.game_status == COUNTDOWN:
+        #     # Set all LEDs to Countdown
+        #     print("Countdown!")
+        #     game.game_status = IN_GAME
+        #     for i in range(0,3):
+        #         countdown_leds.activate(i)
+        #         countdown_leds.animate()
+        #         print(4-(i+1))
+        #         time.sleep(.75)
+        #     countdown_leds.freeze()
+        #     pass
+        #     pass
 
         elif game.game_status == IN_GAME:
             print("GO!!!")
