@@ -22,7 +22,7 @@ from Idle_LeaderboardGUI import Ui_MainWindow
 from PyQt5 import QtGui, QtWidgets
 from csv import writer
 import os 
-from threading import Thread
+import threading 
 
 
 STANDBY = 0
@@ -105,17 +105,7 @@ class KineticTowerGame:
 
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication([])
-    Countwindow = QtWidgets.QWidget()
-    ui = Ui_Form()
-    ui.setupUi(Countwindow)
-    Countwindow.show()
 
-    for i in range(6):
-        ui.lcdNumber.display(i)
-        time.sleep(0.5)
-    Countwindow.close()
-    
     print("Kinetic Tower Starting")
 
     ## Setup Power Sensors
@@ -201,6 +191,12 @@ if __name__ == "__main__":
         Solid(pixels, color.BLACK),
     )
 
+    app = QtWidgets.QApplication([])
+    Countwindow = QtWidgets.QWidget()
+    ui = Ui_Form()
+    ui.setupUi(Countwindow)
+
+    threading.Thread(target=Countwindow).start()
 
     # Sets the game to run indefinetly 
     while True:
