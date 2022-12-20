@@ -16,14 +16,11 @@ from score import Score
 from adafruit_ina219 import ADCResolution, BusVoltageRange, INA219
 import subprocess
 import sys
-from CountDown_GUI import Ui_Form
-from GameRunningGui import GameUi_Form
-from Idle_LeaderboardGUI import Ui_MainWindow
-from PyQt5 import QtGui, QtWidgets
 from csv import writer
 import os 
 import threading 
-
+from PyQt5.QtWidgets import *
+import pygame
 
 STANDBY = 0
 COUNTDOWN = 1
@@ -41,6 +38,8 @@ MAGENTA= u"\u001b[35m"
 YELLOW= u"\u001b[33m"
 GREEN = u"\u001b[32m"
 RESET = u"\u001b[0m"
+
+
 
 class KineticTowerGame:
     def __init__(
@@ -102,11 +101,52 @@ class KineticTowerGame:
         game_go = input()
         return game_go
 
+    def LeaderboadGUI():
+        app = QApplication(sys.argv)
+        window = QWidget()
+        window.label = QLabel("This is a label")
+        window.show()
+        app.exec()
 
+    def gameplay_gui(self):
+        pygame.init()
+        (width, height) = (300,200)
+        screen = pygame.display.set_mode((width, height))
+        # screen.fill((255,0,0))
+        # pygame.display.flip()
+        running = True
+        while running:
+            while self.game_status == STANDBY:
+                screen.fill((255,0,0))
+                pygame.display.flip()
+            while self.game_status == IN_GAME:
+                screen.fill((0,255,0))
+                pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        pygame.display.quit()
+        pygame.quit()
+
+    def pygametry():
+        pygame.init()
+        (width, height) = (300,200)
+        screen = pygame.display.set_mode((width, height))
+        screen.fill((255,0,0))
+        pygame.display.flip()
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+        pygame.display.quit()
+        pygame.quit()
 
 if __name__ == "__main__":
 
     print("Kinetic Tower Starting")
+
+    #os.putenv('SDL_VIDEODRIVER', 'fbcon')
 
     ## Setup Power Sensors
     i2c_bus = board.I2C()
@@ -190,13 +230,8 @@ if __name__ == "__main__":
         Solid(pixels, color.GREEN),
         Solid(pixels, color.BLACK),
     )
-
-    app = QtWidgets.QApplication([])
-    Countwindow = QtWidgets.QWidget()
-    ui = Ui_Form()
-    ui.setupUi(Countwindow)
-
-    threading.Thread(target=Countwindow).start()
+    
+    X=threading.Thread(target=game.gameplay_gui)
 
     # Sets the game to run indefinetly 
     while True:
@@ -207,13 +242,16 @@ if __name__ == "__main__":
             # Set all LEDs to Standby Animation
             # standby.animate()
             clear_leds.animate()
+            
             # Set players back to start
             os.system('clear')
             print(RESET)
+            X.start()
             print("Entering Standby")
             print("Who can generate the power needed in the stortest time?!")
             while game.game_status == STANDBY:
                 standby_leds.animate()
+                
                 # test_leds.animate()
                 pass
             p1.reset()
@@ -221,7 +259,6 @@ if __name__ == "__main__":
             pass
 
         elif game.game_status == COUNTDOWN:
-
             # Set all LEDs to Countdown
             print("Countdown!")
             game.game_status = IN_GAME
@@ -278,7 +315,7 @@ if __name__ == "__main__":
                     game.game_duration = game_time
                     #print(LINE_UP, LINE_UP, LINE_CLEAR)
                 
-                #Gamewindow.close()
+                
                 pass
         elif game.game_status == RESULTS:
             print("Show Results")
@@ -286,4 +323,6 @@ if __name__ == "__main__":
                 game.show_results()
                 pass
         else:
-            print("Exit Program - should not be reached")        
+            print("Exit Program - should not be reached")
+
+    exit()
