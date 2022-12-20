@@ -71,7 +71,8 @@ class KineticTowerGame:
         if not GPIO.input(self.game_start_pin):
             if self.game_status == STANDBY:
                 print("Game Start Button Pressed")
-                self.game_status = COUNTDOWN
+                #self.game_status = COUNTDOWN
+                self.game_status = IN_GAME
             else:
                 print("Game Ended with button press")
                 self.game_status = STANDBY
@@ -112,19 +113,23 @@ class KineticTowerGame:
         pygame.init()
         (width, height) = (300,200)
         screen = pygame.display.set_mode((width, height))
-        # screen.fill((255,0,0))
-        # pygame.display.flip()
         running = True
         while running:
             while self.game_status == STANDBY:
                 screen.fill((255,0,0))
                 pygame.display.flip()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+                        break
             while self.game_status == IN_GAME:
                 screen.fill((0,255,0))
                 pygame.display.flip()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+
+            while game.game_status == RESULTS:
+                screen.fill((0,0,255))
+                pygame.display.flip()
+        
         pygame.display.quit()
         pygame.quit()
 
@@ -176,9 +181,9 @@ if __name__ == "__main__":
 
     GPIO.add_event_detect(
         game.game_start_pin,
-        GPIO.FALLING,
+        GPIO.BOTH,
         callback=game.game_start_button_callback,
-        bouncetime=500,
+        bouncetime=350
     )
     # GPIO.add_event_detect(
     #     p1.input_pin, GPIO.FALLING, callback=p1.button_power_gen, bouncetime=200
@@ -231,13 +236,16 @@ if __name__ == "__main__":
         Solid(pixels, color.BLACK),
     )
     
-    X=threading.Thread(target=game.gameplay_gui)
+    gui_thread = threading.Thread(target=game.gameplay_gui)
+
+    # Start GUI thread outsde loop. Can only be started once
+    gui_thread.start()
 
     # Sets the game to run indefinetly 
     while True:
 
         clear_leds.animate()
-
+        
         if game.game_status == STANDBY:
             # Set all LEDs to Standby Animation
             # standby.animate()
@@ -246,7 +254,7 @@ if __name__ == "__main__":
             # Set players back to start
             os.system('clear')
             print(RESET)
-            X.start()
+            
             print("Entering Standby")
             print("Who can generate the power needed in the stortest time?!")
             while game.game_status == STANDBY:
@@ -258,18 +266,18 @@ if __name__ == "__main__":
             p2.reset()
             pass
 
-        elif game.game_status == COUNTDOWN:
-            # Set all LEDs to Countdown
-            print("Countdown!")
-            game.game_status = IN_GAME
-            for i in range(0,3):
-                countdown_leds.activate(i)
-                countdown_leds.animate()
-                print(4-(i+1))
-                time.sleep(.75)
-            countdown_leds.freeze()
-            pass
-            pass
+        # elif game.game_status == COUNTDOWN:
+        #     # Set all LEDs to Countdown
+        #     print("Countdown!")
+        #     game.game_status = IN_GAME
+        #     for i in range(0,3):
+        #         countdown_leds.activate(i)
+        #         countdown_leds.animate()
+        #         print(4-(i+1))
+        #         time.sleep(.75)
+        #     countdown_leds.freeze()
+        #     pass
+        #     pass
 
         elif game.game_status == IN_GAME:
             print("GO!!!")
