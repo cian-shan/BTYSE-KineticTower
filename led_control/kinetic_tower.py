@@ -111,39 +111,71 @@ class KineticTowerGame:
 
     def gameplay_gui(self):
         pygame.init()
-        (width, height) = (300,200)
+        width = 1920
+        height = 1080
         screen = pygame.display.set_mode((width, height))
+        dialogue_font = pygame.font.SysFont('arial', 50)
+        adi_logo = pygame.image.load('assets/ADI_logo.png').convert()
+        adi_logo = pygame.transform.scale(adi_logo, (202,113))
+        adi_logo_rect = adi_logo.get_rect(topleft=(20,20))
+        pygame.display.set_caption('Kinetic Tower')
         running = True
         while running:
+            # use ctrl + esc to exit fullscreen
             while self.game_status == STANDBY:
-                screen.fill((255,0,0))
-                pygame.display.flip()
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
-                        break
+                
+                leaderboard_txt = dialogue_font.render('Leaderboard', True, color.BLACK)
+                leaderboard_rect = leaderboard_txt.get_rect(center=(int(width/2), int(height/2)))
+
+                screen.fill(color.WHITE)
+                screen.blit(leaderboard_txt, leaderboard_rect)
+                screen.blit( adi_logo, adi_logo_rect)
+                pygame.display.update()
+
+                # if pygame.event.get().type == pygame.QUIT:
+                #     pygame.quit()
+                #     exit()
+
+                #for event in pygame.event.get():
+                    #if event.type == pygame.QUIT:
+                        #running = False
+                        #pygame.quit()
+                        #exit()
+                        #break
             while self.game_status == IN_GAME:
-                screen.fill((0,255,0))
-                pygame.display.flip()
+                player1_txt = dialogue_font.render('Player 1', True, color.BLACK)
+                player2_txt = dialogue_font.render('Player 2', True, color.BLACK)
+                player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
+                player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
+                
+                player1_txt_rect = player1_txt.get_rect(center=(int(width/4), int(height/2)))
+                player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)))
 
+                player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 100))
+                player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
+
+                screen.fill(color.GREEN)
+                screen.blit( adi_logo, adi_logo_rect)
+                screen.blit(player1_txt, player1_txt_rect)
+                screen.blit(player2_txt, player2_txt_rect)
+                
+                pygame.display.update()
+                while self.game_status == IN_GAME:
+                    screen.fill(color.GREEN)
+                    player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
+                    player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
+                    p1_screen = screen.blit(player1_score, player1_score_rect)
+                    p2_screen = screen.blit(player2_score, player2_score_rect)
+            
+                    screens = [p1_screen, p2_screen]
+                    pygame.display.update(screens)
+
+                    
             while game.game_status == RESULTS:
-                screen.fill((0,0,255))
+                screen.fill(color.BLUE)
                 pygame.display.flip()
-        
-        pygame.display.quit()
-        pygame.quit()
 
-    def pygametry():
-        pygame.init()
-        (width, height) = (300,200)
-        screen = pygame.display.set_mode((width, height))
-        screen.fill((255,0,0))
-        pygame.display.flip()
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
+        
         pygame.display.quit()
         pygame.quit()
 
@@ -291,6 +323,9 @@ if __name__ == "__main__":
                 game_leds.animate()
                 p2.ina219_pwr_gen()
                 p1.ina219_pwr_gen()
+
+                game.p1_energy = p1.energy_gen
+                game.p2_energy = p2.energy_gen
 
                 game_time = time.time() - game_start_time 
 
