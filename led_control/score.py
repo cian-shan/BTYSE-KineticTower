@@ -117,6 +117,8 @@ class Score:
 
                 self.print_top10(list_of_scores)
 
+                return list_of_scores
+
             # If not all data is collected try again until try limit is met
             except Exception as e:
                 print(e)
@@ -127,7 +129,7 @@ class Score:
                     self.get_top_10()
                 else:
                     print("Cannot Collect 10 Top data")
-        pass
+        return 
 
     def print_top10(self, top_10_list):
 
@@ -141,7 +143,6 @@ class Score:
             print(
                 score["@EntryName"], "\t\t", score["@SchoolName"], "\t", score["@Score"]
             )
-
         pass
 
 

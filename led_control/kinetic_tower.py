@@ -103,82 +103,127 @@ class KineticTowerGame:
         game_go = input()
         return game_go
 
-    def LeaderboadGUI():
-        app = QApplication(sys.argv)
-        window = QWidget()
-        window.label = QLabel("This is a label")
-        window.show()
-        app.exec()
+    def leaderboard_gui():
+        pass
 
     def gameplay_gui(self):
         pygame.init()
         width = 1920
         height = 1080
-        screen = pygame.display.set_mode((width, height))
+        screen = pygame.display.set_mode((width, height), pygame.FULLSCREEN)
         dialogue_font = pygame.font.SysFont('arial', 50)
+        score_font = pygame.font.SysFont('arial', 35)
         adi_logo = pygame.image.load('assets/ADI_logo.png').convert()
         adi_logo = pygame.transform.scale(adi_logo, (202,113))
         adi_logo_rect = adi_logo.get_rect(topleft=(20,20))
         pygame.display.set_caption('Kinetic Tower')
+        pygame.event.set_allowed(pygame.QUIT)
         running = True
-        while running:
-            # use ctrl + esc to exit fullscreen
-            while self.game_status == STANDBY:
-                
-                leaderboard_txt = dialogue_font.render('Leaderboard', True, color.BLACK)
-                leaderboard_rect = leaderboard_txt.get_rect(center=(int(width/2), int(height/2)))
 
-                screen.fill(color.WHITE)
-                screen.blit(leaderboard_txt, leaderboard_rect)
-                screen.blit( adi_logo, adi_logo_rect)
-                pygame.display.update()
 
-                # if pygame.event.get().type == pygame.QUIT:
-                #     pygame.quit()
-                #     exit()
+        try:
+            while running:
+                # use ctrl + esc to exit fullscreen
+                while self.game_status == STANDBY:
+                    
+                    leaderboard = Score()
 
-                #for event in pygame.event.get():
-                    #if event.type == pygame.QUIT:
-                        #running = False
-                        #pygame.quit()
-                        #exit()
-                        #break
-            while self.game_status == IN_GAME:
-                player1_txt = dialogue_font.render('Player 1', True, color.BLACK)
-                player2_txt = dialogue_font.render('Player 2', True, color.BLACK)
-                player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
-                player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
-                
-                player1_txt_rect = player1_txt.get_rect(center=(int(width/4), int(height/2)))
-                player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)))
+                    leaderoard_list = leaderboard.get_top_10()
+                    
+                    leaderboard_title = dialogue_font.render('Leaderboard', True, color.BLACK)
+                    leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), 80))
 
-                player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 100))
-                player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
+                    header_name_list = ['Initials', 'School', 'Score']
+                    header_blit_list = []
+                    item_width = width/6
+                    for item in header_name_list:
 
-                screen.fill(color.GREEN)
-                screen.blit( adi_logo, adi_logo_rect)
-                screen.blit(player1_txt, player1_txt_rect)
-                screen.blit(player2_txt, player2_txt_rect)
-                
-                pygame.display.update()
+                        leaderboard_header = dialogue_font.render(item, True, color.BLACK)
+                        leaderboard_header_rect = leaderboard_header.get_rect(center=(int(item_width), 160))
+                        header_blit_list.append((leaderboard_header, leaderboard_header_rect))
+                        item_width += width/3
+
+                    score_name_list = ["@EntryName", "@SchoolName", "@Score"]
+                    score_blit_list = []
+                    
+                    item_width = width/6
+                    item_height = height/5
+                    for score in leaderoard_list:
+                        item_width = width/6
+                        for item in score_name_list:
+                            score_element = score_font.render(score[item], True, color.BLACK)
+                            score_element_rect = score_element.get_rect(center=(int(item_width), int(item_height)) )
+                            score_blit_list.append((score_element, score_element_rect))
+                            item_width += width/3
+                        item_height += 50
+
+                    screen.fill(color.WHITE)
+                    screen.blit(leaderboard_title, leaderboard_title_rect)
+                    screen.blit( adi_logo, adi_logo_rect)
+                    screen.blits(header_blit_list)
+                    screen.blits(score_blit_list)
+
+                    pygame.display.update()
+
+                    while self.game_status == STANDBY:
+
+                        # if pygame.event.get() == pygame.QUIT:
+                        #     print("Got quit")
+                        # pygame.event.clear()
+
+                    # if pygame.event.get().type == pygame.QUIT:
+                    #     pygame.quit()
+                    #     exit()
+
+                        # Can only close window from Standby
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                pygame.display.quit()
+                                pygame.quit()
+                                print("Got quit")
+                            if event.type == pygame.KEYDOWN:
+                                print("Toggle Fullscreen")
+                                pygame.display.toggle_fullscreen()
+
+                            #running = False
+                            #pygame.quit()
+                            #exit()
+                            #break
                 while self.game_status == IN_GAME:
-                    screen.fill(color.GREEN)
+                    player1_txt = dialogue_font.render('Player 1', True, color.BLACK)
+                    player2_txt = dialogue_font.render('Player 2', True, color.BLACK)
                     player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
                     player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
-                    p1_screen = screen.blit(player1_score, player1_score_rect)
-                    p2_screen = screen.blit(player2_score, player2_score_rect)
-            
-                    screens = [p1_screen, p2_screen]
-                    pygame.display.update(screens)
-
                     
-            while game.game_status == RESULTS:
-                screen.fill(color.BLUE)
-                pygame.display.flip()
+                    player1_txt_rect = player1_txt.get_rect(center=(int(width/4), int(height/2)))
+                    player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)))
 
-        
-        pygame.display.quit()
-        pygame.quit()
+                    player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 100))
+                    player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
+
+                    screen.fill(color.GREEN)
+                    screen.blit( adi_logo, adi_logo_rect)
+                    screen.blit(player1_txt, player1_txt_rect)
+                    screen.blit(player2_txt, player2_txt_rect)
+                    
+                    pygame.display.update()
+                    while self.game_status == IN_GAME:
+                        screen.fill(color.GREEN)
+                        player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
+                        player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
+                        p1_screen = screen.blit(player1_score, player1_score_rect)
+                        p2_screen = screen.blit(player2_score, player2_score_rect)
+                
+                        screens = [p1_screen, p2_screen]
+                        pygame.display.update(screens)
+
+                        
+                while game.game_status == RESULTS:
+                    screen.fill(color.BLUE)
+                    pygame.display.flip()
+        finally:
+            pygame.display.quit()
+            pygame.quit()    
 
 if __name__ == "__main__":
 
