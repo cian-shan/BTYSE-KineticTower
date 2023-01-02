@@ -99,10 +99,17 @@ class Score:
             # Try to capture top 10 list
             try:
                 top_10_header = s.recv(1024)
-                top_10_bytes = s.recv(1298)
+                top_10_bytes = s.recv(1286)
                 print("Bytes Recieved: ", len(top_10_bytes))
+                header_xml = top_10_header.decode().strip()
+                
+                clean_header = header_xml.replace("{\"s\":\"Normal\",\"len\":", "")
+                header_length = clean_header.replace("}", "")
+                #header = xmltodict.parse(clean_header, encoding="UTF-16")
+                #print(clean_header)
+
                 # Make sure all data is collected
-                if len(top_10_bytes) < 1298:
+                if len(top_10_bytes) < int(header_length):
                     raise Exception("Error Gathering Data - will try again")
 
                 top_10_xml = top_10_bytes.decode().strip()
@@ -122,7 +129,7 @@ class Score:
             # If not all data is collected try again until try limit is met
             except Exception as e:
                 print(e)
-                attempt_limit = 3
+                attempt_limit = 2
                 if self.attempt_num < attempt_limit:
                     time.sleep(1)
                     self.attempt_num += 1

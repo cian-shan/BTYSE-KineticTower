@@ -129,7 +129,7 @@ class KineticTowerGame:
 
                         if leaderboard_list is not None:
                        
-                            print(str(leaderboard_list))
+                            #print(str(leaderboard_list))
                             
                             leaderboard_title = dialogue_font.render('Leaderboard', True, color.WHITE)
                             leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), 120))
@@ -254,9 +254,9 @@ class KineticTowerGame:
                     while game.game_status == RESULTS:
 
                         # Get info from user
-                        input_entry_name = pygame_textinput.TextInputVisualizer(font_color=name_color, font_object=dialogue_font)
+                        input_entry_name = pygame_textinput.TextInputVisualizer(font_color=name_color, font_object=dialogue_font, cursor_color=color.WHITE)
                         input_entry_name.value = 'Entry'
-                        input_entry_school = pygame_textinput.TextInputVisualizer(font_color=school_color, font_object=dialogue_font)
+                        input_entry_school = pygame_textinput.TextInputVisualizer(font_color=school_color, font_object=dialogue_font, cursor_color=color.WHITE)
                         input_entry_school.value = 'School'
 
                         name_rect = input_entry_name.surface.get_rect(center = (int(width/2), int(height/2)))
@@ -297,9 +297,10 @@ class KineticTowerGame:
                                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                                     print("GOT School name: ", input_entry_school.value)
                                     get_entry = 3
-                                    new_score = Score(entry_name=input_entry_name.value, school_name=input_entry_school.value, score=200-round(game.game_duration, 2)) 
+                                    new_score = Score(entry_name=input_entry_name.value, school_name=input_entry_school.value, score=int(200-game.game_duration))
                                     try:
                                         new_score.submit_score()
+                                        time.sleep(2)
                                     except:
                                         print("Failed to submit score - continuing")
                                     game.update_game_status(STANDBY)
