@@ -114,6 +114,7 @@ class KineticTowerGame:
         pygame.display.set_caption('Kinetic Tower')
         pygame.event.set_allowed([pygame.QUIT, pygame.K_RETURN])
         running = True
+        color_pool = cycle(color.RAINBOW)
 
         try:
             while running:
@@ -123,67 +124,73 @@ class KineticTowerGame:
                     
                     leaderboard = Score()
 
-                    leaderboard_list = leaderboard.get_top_10()
+                    try:
+                        leaderboard_list = leaderboard.get_top_10()
 
-                    if leaderboard_list is None:
-                        print("Cannot gather list from Database")
+                        if leaderboard_list is not None:
+                       
+                            print(str(leaderboard_list))
+                            
+                            leaderboard_title = dialogue_font.render('Leaderboard', True, color.WHITE)
+                            leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), 120))
+
+                            header_name_list = ['Initials', 'School', 'Score']
+                            header_blit_list = []
+                            item_width = width/5
+                            for item in header_name_list:
+
+                                leaderboard_header = dialogue_font.render(item, True, color.WHITE)
+                                leaderboard_header_rect = leaderboard_header.get_rect(center=(int(item_width), int(height/4)))
+                                header_blit_list.append((leaderboard_header, leaderboard_header_rect))
+                                item_width += width/4 + 50
+
+                            score_name_list = ["@EntryName", "@SchoolName", "@Score"]
+                            score_blit_list = []
+                            
+                            item_height = height/4 + 75
+                            
+
+                            for score in leaderboard_list:
+                                if score is not None:
+                                    item_width = width/5
+                                    entry_color = next(color_pool)
+                                
+                                    for item in score_name_list:
+                                        score_element = score_font.render(score[item], True, entry_color)
+                                        score_element_rect = score_element.get_rect(center=(int(item_width), int(item_height)) )
+                                        score_blit_list.append((score_element, score_element_rect))
+                                        item_width += width/4 + 50
+                                    item_height += 50
+
+
+                            screen.fill(color.BLACK)
+                            screen.blit(leaderboard_title, leaderboard_title_rect)
+                            screen.blit( adi_logo, adi_logo_rect)
+                            screen.blits(header_blit_list)
+                            screen.blits(score_blit_list)
+
+                            pygame.display.update()
+
+                            while self.game_status == STANDBY:
+
+                                # Can only close window from Standby
+                                for event in pygame.event.get():
+                                    if event.type == pygame.QUIT:
+                                        pygame.display.quit()
+                                        pygame.quit()
+                                        print("Got quit")
+                                    if event.type == pygame.KEYDOWN:
+                                        print("Toggle Fullscreen")
+                                        pygame.display.toggle_fullscreen()
+
+                    except:
+                        print("Cannot connect to database - continuing with simple mode")
                         leaderboard_title = dialogue_font.render('Press Button to Play!', True, color.WHITE)
                         leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), int(height/2)))
-                        
-                    else:    
-                        print(str(leaderboard_list))
-                        
-                        leaderboard_title = dialogue_font.render('Leaderboard', True, color.WHITE)
-                        leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), 120))
-
-                        header_name_list = ['Initials', 'School', 'Score']
-                        header_blit_list = []
-                        item_width = width/5
-                        for item in header_name_list:
-
-                            leaderboard_header = dialogue_font.render(item, True, color.WHITE)
-                            leaderboard_header_rect = leaderboard_header.get_rect(center=(int(item_width), int(height/4)))
-                            header_blit_list.append((leaderboard_header, leaderboard_header_rect))
-                            item_width += width/4 + 50
-
-                        score_name_list = ["@EntryName", "@SchoolName", "@Score"]
-                        score_blit_list = []
-                        
-                        item_height = height/4 + 75
-                        color_pool = cycle(color.RAINBOW)
-
-                        for score in leaderboard_list:
-                            if score is not None:
-                                item_width = width/5
-                                entry_color = next(color_pool)
-                            
-                                for item in score_name_list:
-                                    score_element = score_font.render(score[item], True, entry_color)
-                                    score_element_rect = score_element.get_rect(center=(int(item_width), int(item_height)) )
-                                    score_blit_list.append((score_element, score_element_rect))
-                                    item_width += width/4 + 50
-                                item_height += 50
-
-
                         screen.fill(color.BLACK)
                         screen.blit(leaderboard_title, leaderboard_title_rect)
-                        screen.blit( adi_logo, adi_logo_rect)
-                        screen.blits(header_blit_list)
-                        screen.blits(score_blit_list)
-
                         pygame.display.update()
-
-                        while self.game_status == STANDBY:
-
-                            # Can only close window from Standby
-                            for event in pygame.event.get():
-                                if event.type == pygame.QUIT:
-                                    pygame.display.quit()
-                                    pygame.quit()
-                                    print("Got quit")
-                                if event.type == pygame.KEYDOWN:
-                                    print("Toggle Fullscreen")
-                                    pygame.display.toggle_fullscreen()
+                        
 
                 while self.game_status == IN_GAME:
                     
@@ -290,6 +297,11 @@ class KineticTowerGame:
                                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                                     print("GOT School name: ", input_entry_school.value)
                                     get_entry = 3
+                                    new_score = Score(entry_name=input_entry_name.value, school_name=input_entry_school.value, score=200-round(game.game_duration, 2)) 
+                                    try:
+                                        new_score.submit_score()
+                                    except:
+                                        print("Failed to submit score - continuing")
                                     game.update_game_status(STANDBY)
                                                     
                         
