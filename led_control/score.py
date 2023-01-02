@@ -5,7 +5,7 @@ import xmltodict
 
 # TCP_IP = '127.0.0.1'
 # HOST = '169.254.207.119'
-HOST = "192.168.1.17"
+HOST = "192.168.0.15"
 PORT = 9000
 CLIENT_IP = socket.gethostbyname(socket.gethostname())
 GAME_NAME = "Kinetic Tower"
@@ -22,7 +22,7 @@ class Score:
         self.sender_ip = str(CLIENT_IP)
         self.attempt_num = 0
 
-    def create_xml(self):
+    def submit_score(self):
 
         score = {
             "NewScoreMessage": {
@@ -115,21 +115,22 @@ class Score:
 
                 list_of_scores = full_msg["TopScoreListMessage"]["TopScoresList"]["Score"]
 
-                self.print_top10(list_of_scores)
-
                 return list_of_scores
+
+                # self.print_top10(list_of_scores)
 
             # If not all data is collected try again until try limit is met
             except Exception as e:
                 print(e)
-                attempt_limit = 2
+                attempt_limit = 3
                 if self.attempt_num < attempt_limit:
-                    time.sleep(0.5)
+                    time.sleep(1)
                     self.attempt_num += 1
                     self.get_top_10()
                 else:
                     print("Cannot Collect 10 Top data")
-        return 
+
+        
 
     def print_top10(self, top_10_list):
 
