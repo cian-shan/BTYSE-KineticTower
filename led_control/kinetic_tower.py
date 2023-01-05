@@ -25,6 +25,7 @@ GET_INPUT = 1
 IN_GAME = 2
 RESULTS = 3
 FULL_BRIGHTNESS = .1
+OFFLINE_MODE = False
 
 # When using full length strips
 #LED_COUNT = 1085
@@ -297,7 +298,7 @@ class KineticTowerGame:
                                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                                     print("GOT School name: ", input_entry_school.value)
                                     get_entry = 3
-                                    new_score = Score(entry_name=input_entry_name.value, school_name=input_entry_school.value, score=int(200-game.game_duration))
+                                    new_score = Score(entry_name=input_entry_name.value, school_name=input_entry_school.value, score=int(300-game.game_duration))
                                     try:
                                         new_score.submit_score()
                                         time.sleep(2)

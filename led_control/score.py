@@ -5,7 +5,7 @@ import xmltodict
 
 # TCP_IP = '127.0.0.1'
 # HOST = '169.254.207.119'
-HOST = "192.168.0.15"
+HOST = "192.168.47.210"
 PORT = 9000
 CLIENT_IP = socket.gethostbyname(socket.gethostname())
 GAME_NAME = "Kinetic Tower"
@@ -60,7 +60,7 @@ class Score:
             #print("Sent separator")
             s.sendall(data)
             #print("Sent data:", data)
-            print("Score data sent")
+            print("Score data sent: ")
         # print(xml)
 
     def get_top_10(self):
