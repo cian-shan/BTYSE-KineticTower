@@ -48,6 +48,7 @@ class Score:
         # https://github.com/jchristn/WatsonTcp/blob/master/FRAMING.md
         separator = "\r\n\r\n"
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(5)
             s.connect((HOST, PORT))
             data = xml.encode()  # data to send
             meta = {}  # any metadata to include
@@ -81,30 +82,33 @@ class Score:
         # define separator between header and data
         # https://github.com/jchristn/WatsonTcp/blob/master/FRAMING.md
         separator = "\r\n\r\n"
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            data = xml.encode()  # data to send
-            meta = {}  # any metadata to include
-            dic = {"len": len(data), "s": "Normal", "md": meta}
-            header = json.dumps(dic)
-            # below sendall could combine into one
-            s.sendall(header.encode("utf-8"))
-            #print("Sent header:", header)
-            s.sendall(separator.encode("utf-8"))
-            #print("Sent separator")
-            s.sendall(data)
-            #print("Sent data:", data)
-            print("Request for 10 Top sent")
 
-            # Try to capture top 10 list
-            try:
+        # Try to capture top 10 list
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(5)
+                s.connect((HOST, PORT))
+                data = xml.encode()  # data to send
+                meta = {}  # any metadata to include
+                dic = {"len": len(data), "s": "Normal", "md": meta}
+                header = json.dumps(dic)
+                # below sendall could combine into one
+                s.sendall(header.encode("utf-8"))
+                #print("Sent header:", header)
+                s.sendall(separator.encode("utf-8"))
+                #print("Sent separator")
+                s.sendall(data)
+                #print("Sent data:", data)
+                print("Request for 10 Top sent")
+
                 top_10_header = s.recv(1024)
-                top_10_bytes = s.recv(1286)
-                print("Bytes Recieved: ", len(top_10_bytes))
-                header_xml = top_10_header.decode().strip()
                 
+                header_xml = top_10_header.decode().strip()
                 clean_header = header_xml.replace("{\"s\":\"Normal\",\"len\":", "")
                 header_length = clean_header.replace("}", "")
+                print("Bytes in 10 TOP: ", int(header_length))
+                top_10_bytes = s.recv(int(header_length))
+                print("Bytes Recieved: ", len(top_10_bytes))
                 #header = xmltodict.parse(clean_header, encoding="UTF-16")
                 #print(clean_header)
 
@@ -126,17 +130,18 @@ class Score:
 
                 # self.print_top10(list_of_scores)
 
-            # If not all data is collected try again until try limit is met
-            except Exception as e:
-                print(e)
-                attempt_limit = 2
-                if self.attempt_num < attempt_limit:
-                    time.sleep(1)
-                    self.attempt_num += 1
-                    self.get_top_10()
-                else:
-                    print("Cannot Collect 10 Top data")
-
+        # If not all data is collected try again until try limit is met
+        except Exception as e:
+            attempt_limit = 2
+            if self.attempt_num < attempt_limit:
+                print(self.attempt_num)
+                time.sleep(1)
+                self.attempt_num += 1
+                self.get_top_10()
+            else:
+                raise ConnectionError("Cannot Collect 10 Top data")
+                return None
+                
         
 
     def print_top10(self, top_10_list):
@@ -152,7 +157,7 @@ class Score:
                 score["@EntryName"], "\t\t", score["@SchoolName"], "\t", score["@Score"]
             )
         pass
-
+    
 
 if __name__ == "__main__":
     # This program tests adding scores and retriving score from the central leaderboard server
@@ -162,10 +167,10 @@ if __name__ == "__main__":
     # Test creating an XML Score
     # score1 = vars(Score("Jenny", "School NS", 120))
     # Score.create_xml(score1)
-    s1 = Score("Kenny", "School NS", 123)
+    s1 = Score("Kenny", "School NS", 9.2)
     s2 = Score()
     # Submit new score
-    # s1.create_xml()
+    s1.submit_score()
     # Get to 10 for leaderboard
     s2.get_top_10()
     # Score.log_interaction()
