@@ -4,7 +4,7 @@ import time
 
 class Player:
     def __init__(
-        self, player_ID, input_pin, power_sensor, player_leds=None, energy_gen=0
+        self, player_ID, input_pin, power_sensor=None, player_leds=None, energy_gen=0
     ):
         self.player_ID = player_ID
         self.input_pin = input_pin
