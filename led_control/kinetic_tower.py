@@ -24,18 +24,18 @@ STANDBY = 0
 GET_INPUT = 1
 IN_GAME = 2
 RESULTS = 3
-FULL_BRIGHTNESS = .1
+FULL_BRIGHTNESS = 0.5
 
 
 # When using full length strips
-#LED_COUNT = 1085
-#LED_HEIGHT = 180
-#GAME_WIN_LEVEL = 60
+LED_COUNT = 1085
+LED_HEIGHT = 180
+GAME_WIN_LEVEL = 60
 
 # When using LED Matrix
-LED_HEIGHT = 32
-LED_COUNT = 256
-GAME_WIN_LEVEL = 11
+# LED_HEIGHT = 32
+# LED_COUNT = 256
+# GAME_WIN_LEVEL = 11
 
 LINE_UP = u"\u001b[1A"
 LINE_CLEAR = u"\u001b[1K"
@@ -108,7 +108,7 @@ class KineticTowerGame:
         game_status 
         """
 
-        OFFLINE_MODE = False
+        OFFLINE_MODE = True
 
         pygame.init()
         width = 1920
@@ -136,10 +136,12 @@ class KineticTowerGame:
                         if OFFLINE_MODE is False:
                             print("Attempting to get top 10")
                             leaderboard_list = leaderboard.get_top_10()
+                            #time.sleep(0.1)
+                            print("KT LIST GOT: " + str(leaderboard_list))
 
                             if leaderboard_list is not None:
                         
-                                # print(str(leaderboard_list))
+                                print(str(leaderboard_list))
                                 
                                 leaderboard_title = dialogue_font.render('Leaderboard', True, color.WHITE)
                                 leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), 120))
@@ -166,7 +168,7 @@ class KineticTowerGame:
                                         entry_color = next(color_pool)
                                     
                                         for item in score_name_list:
-                                            score_element = score_font.render(score[item], True, entry_color)
+                                            score_element = score_font.render(score.get(item), True, entry_color)
                                             score_element_rect = score_element.get_rect(center=(int(item_width), int(item_height)) )
                                             score_blit_list.append((score_element, score_element_rect))
                                             item_width += width/4 + 50
@@ -204,6 +206,7 @@ class KineticTowerGame:
                         leaderboard_title = dialogue_font.render('Press Button to Play!', True, color.WHITE)
                         leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), int(height/2)))
                         screen.fill(color.BLACK)
+                        
                         screen.blit(leaderboard_title, leaderboard_title_rect)
                         pygame.display.update()
 
@@ -229,28 +232,37 @@ class KineticTowerGame:
                     player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
                     player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
                     
-                    player1_txt_rect = player1_txt.get_rect(center=(int(width/4), int(height/2)))
-                    player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)))
+                    player1_txt_rect = player1_txt.get_rect(center=(int(width/2), int(height/2)))
+                    #player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)))
 
-                    player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 100))
-                    player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
+                    player1_score_rect = player1_score.get_rect(center=(int(width/2), int(height/2) + 100))
+                    #player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
+
+                    # score_screen = screen.display.geset_mode((960,150))
+                    # score_screen_rect = score_screen.get_rect(center=(int(width/2), int(height/2)))
 
                     screen.fill(color.GREEN)
                     screen.blit( adi_logo, adi_logo_rect)
                     screen.blit(player1_txt, player1_txt_rect)
-                    screen.blit(player2_txt, player2_txt_rect)
+                    #screen.blit(player2_txt, player2_txt_rect)
                     
                     pygame.display.update()
                     while self.game_status == IN_GAME:
                         screen.fill(color.GREEN)
                         player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
-                        player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
-                        p1_screen = screen.blit(player1_score, player1_score_rect)
-                        p2_screen = screen.blit(player2_score, player2_score_rect)
+                        #player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
+                        screen.fill(color.GREEN)
+                        screen.blit( adi_logo, adi_logo_rect)
+                        screen.blit(player1_txt, player1_txt_rect)
+                        #screen.blit(player2_txt, player2_txt_rect)
+                        # p1_screen = screen.blit(player1_score, player1_score_rect)
+                        # p2_screen = screen.blit(player2_score, player2_score_rect)
+                        screen.blit(player1_score, player1_score_rect)
+                        #screen.blit(player2_score, player2_score_rect)
                 
-                        screens = [p1_screen, p2_screen]
-                        pygame.display.update(screens)
-                        time.sleep(0.1)
+                        # screens = [p1_screen, p2_screen]
+                        pygame.display.update()
+                        time.sleep(0.2)
                         
                         for event in pygame.event.get():
                             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -261,7 +273,7 @@ class KineticTowerGame:
 
                     results_color = next(color_pool)
 
-                    results_title = score_font.render('Results', True, results_color)
+                    results_title = dialogue_font.render('Results', True, results_color)
                     results_title_rect = results_title.get_rect(center=(int(width/2), 120))
 
                     results_color = next(color_pool)
@@ -305,7 +317,7 @@ class KineticTowerGame:
 
                         pygame.display.update()
 
-                        if OFFLINE_MODE is False:
+                        if 1:# if OFFLINE_MODE is False:
                             get_entry = 1
 
                             while get_entry == 1:
@@ -370,11 +382,11 @@ if __name__ == "__main__":
     i2c_bus = board.I2C()
 
     p2_ina219 = INA219(i2c_bus, addr=0x40)
-    p1_ina219 = INA219(i2c_bus, addr=0x44)
+    #p1_ina219 = INA219(i2c_bus, addr=0x44)
 
-    p1_ina219.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
-    p1_ina219.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
-    p1_ina219.bus_voltage_range = BusVoltageRange.RANGE_16V
+    # p1_ina219.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+    # p1_ina219.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+    # p1_ina219.bus_voltage_range = BusVoltageRange.RANGE_16V
 
     p2_ina219.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
     p2_ina219.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
@@ -382,7 +394,7 @@ if __name__ == "__main__":
 
     # Create Strip Objects
     p2 = Player(player_ID='PLAYER 2', input_pin=24, power_sensor=p2_ina219)
-    p1 = Player(player_ID='PLAYER 1', input_pin=25, power_sensor=p1_ina219)
+    p1 = Player(player_ID='PLAYER 1', input_pin=25, power_sensor=p2_ina219)
 
     game = KineticTowerGame()
 
@@ -398,7 +410,7 @@ if __name__ == "__main__":
         callback=game.game_start_button_callback,
         bouncetime=350
     )
-    # GPIO.add_event_detect(
+    # GPIO.add_event_detect(f
     #     p1.input_pin, GPIO.FALLING, callback=p1.button_power_gen, bouncetime=200
     # )
     # GPIO.add_event_detect(
@@ -428,7 +440,7 @@ if __name__ == "__main__":
     )
 
     p1_game_leds = PowerLevel(p1_pixel_map, color.ORANGE, max_height=LED_HEIGHT)
-    p2_game_leds = PowerLevel(p2_pixel_map, color.BLUE, max_height=LED_HEIGHT)
+    p2_game_leds = PowerLevel(p2_pixel_map, color.ORANGE, max_height=LED_HEIGHT)
 
     test_leds = AnimationGroup(
         Blink(p1_pixel_map, speed=0.3, color=color.RED),
@@ -510,11 +522,11 @@ if __name__ == "__main__":
 
                 game_time = time.time() - game_start_time 
 
-                # Print Progress
-                print(f'Player 1: {p1.player_leds.level:8.2f}\nPlayer 2: {p2.player_leds.level:8.2f}\n', end = '')
-                print(f'Game Score: {game_time:8.2f}', end='')
+                # # Print Progress
+                # print(f'Player 1: {p1.player_leds.level:8.2f}\nPlayer 2: {p2.player_leds.level:8.2f}\n', end = '')
+                # print(f'Game Score: {game_time:8.2f}', end='')
 
-                print(LINE_UP, LINE_UP, LINE_UP, LINE_CLEAR)
+                # print(LINE_UP, LINE_UP, LINE_UP, LINE_CLEAR)
                 
 
                 # check for winner
@@ -524,7 +536,7 @@ if __name__ == "__main__":
                     print("\n\n\n")
                     game.winner = p1
                     game.not_winner = p2
-                    game.tot_energy = p1.energy_gen + p2.energy_gen
+                    game.tot_energy = p1.energy_gen #+ p2.energy_gen
                     game.game_status = RESULTS
                     game.game_duration = game_time
                     #print(LINE_UP, LINE_UP, LINE_CLEAR)
@@ -534,7 +546,7 @@ if __name__ == "__main__":
                     print("\n\n\n")
                     game.winner = p2
                     game.not_winner = p1
-                    game.tot_energy = p1.energy_gen + p2.energy_gen
+                    game.tot_energy = p1.energy_gen #+ p2.energy_gen
                     game.game_status = RESULTS
                     game.game_duration = game_time
                     #print(LINE_UP, LINE_UP, LINE_CLEAR)
@@ -544,8 +556,8 @@ if __name__ == "__main__":
             print("Show Results")
             # Define Result LEDs - need to wait till after game has finished to determine leds for winner
             result_leds = AnimationGroup(
-                Blink(game.winner.pixel_map, speed=0.5, color=color.GREEN),
-                Solid(game.not_winner.pixel_map, color.BLACK),
+                Blink(pixels, speed=0.5, color=color.GREEN)
+                #Blink(game.not_winner.pixel_map, speed=0.5, color=color.GREEN),
             )
             while game.game_status == RESULTS:
 

@@ -4,8 +4,8 @@ import time
 import xmltodict
 
 # TCP_IP = '127.0.0.1'
-# HOST = '169.254.207.119'
-HOST = "192.168.47.210"
+HOST = '169.254.207.119'
+#HOST = "192.168.47.210"
 PORT = 9000
 CLIENT_IP = socket.gethostbyname(socket.gethostname())
 GAME_NAME = "Kinetic Tower"
@@ -64,6 +64,8 @@ class Score:
             print("Score data sent: ")
         # print(xml)
 
+    list_of_scores = None
+
     def get_top_10(self):
         get_top_10 = {
             "RequestScoresMessage": {
@@ -86,7 +88,7 @@ class Score:
         # Try to capture top 10 list
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.settimeout(5)
+                s.settimeout(10)
                 s.connect((HOST, PORT))
                 data = xml.encode()  # data to send
                 meta = {}  # any metadata to include
@@ -109,6 +111,8 @@ class Score:
                 print("Bytes in 10 TOP: ", int(header_length))
                 top_10_bytes = s.recv(int(header_length))
                 print("Bytes Recieved: ", len(top_10_bytes))
+
+                #time.sleep(1)
                 #header = xmltodict.parse(clean_header, encoding="UTF-16")
                 #print(clean_header)
 
@@ -117,30 +121,43 @@ class Score:
                     raise Exception("Error Gathering Data - will try again")
 
                 top_10_xml = top_10_bytes.decode().strip()
-                s.close()
+                
 
                 # print("\n\nTOP10")
-                # print(top_10_xml)
+                print(top_10_xml)
 
                 full_msg = xmltodict.parse(top_10_xml, encoding="UTF-16")
 
+                print("full_msg" + str(full_msg))
+                
+                
                 list_of_scores = full_msg["TopScoreListMessage"]["TopScoresList"]["Score"]
+                print("SCORE LIST: " + str(list_of_scores))
 
+                #time.sleep(1)
+                s.close()
+
+                # if list_of_scores is None:
+                #     return self.get_top_10()
+
+                
                 return list_of_scores
+
+                
 
                 # self.print_top10(list_of_scores)
 
         # If not all data is collected try again until try limit is met
         except Exception as e:
-            attempt_limit = 2
+            attempt_limit = 10
             if self.attempt_num < attempt_limit:
                 print(self.attempt_num)
-                time.sleep(1)
+                time.sleep()
                 self.attempt_num += 1
-                self.get_top_10()
+                return self.get_top_10()
             else:
                 raise ConnectionError("Cannot Collect 10 Top data")
-                return None
+                
                 
         
 
@@ -167,10 +184,10 @@ if __name__ == "__main__":
     # Test creating an XML Score
     # score1 = vars(Score("Jenny", "School NS", 120))
     # Score.create_xml(score1)
-    s1 = Score("Kenny", "School NS", 9.2)
+    s1 = Score("TEST", "School NS", 9.2)
     s2 = Score()
     # Submit new score
-    s1.submit_score()
+    #s1.submit_score()
     # Get to 10 for leaderboard
     s2.get_top_10()
     # Score.log_interaction()
