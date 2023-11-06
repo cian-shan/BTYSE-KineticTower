@@ -2,6 +2,10 @@ import board
 import digitalio
 import busio
 
+"""
+Example code to check if the raspiblinka module has been installed correctly
+"""
+
 print("Hello blinka!")
 
 # Try to great a Digital input

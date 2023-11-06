@@ -19,6 +19,7 @@ from itertools import cycle
 import threading 
 import pygame
 import pygame_textinput
+from ade9178_driver import Ade9178
 
 STANDBY = 0
 GET_INPUT = 1
@@ -30,7 +31,7 @@ FULL_BRIGHTNESS = 0.5
 # When using full length strips
 LED_COUNT = 1085
 LED_HEIGHT = 180
-GAME_WIN_LEVEL = 60
+GAME_WIN_LEVEL = 180
 
 # When using LED Matrix
 # LED_HEIGHT = 32
@@ -203,7 +204,7 @@ class KineticTowerGame:
                     except ConnectionError:
                         OFFLINE_MODE = True
                         print("Cannot connect to database - continuing with simple mode")
-                        leaderboard_title = dialogue_font.render('Press Button to Play!', True, color.WHITE)
+                        leaderboard_title = dialogue_font.render('Ready to Play Kinetic Tower!', True, color.WHITE)
                         leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), int(height/2)))
                         screen.fill(color.BLACK)
                         
@@ -232,33 +233,33 @@ class KineticTowerGame:
                     player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
                     player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
                     
-                    player1_txt_rect = player1_txt.get_rect(center=(int(width/2), int(height/2)))
-                    #player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)))
+                    player1_txt_rect = player1_txt.get_rect(center=(int(width/4), int(height/2)))
+                    player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)))
 
-                    player1_score_rect = player1_score.get_rect(center=(int(width/2), int(height/2) + 100))
-                    #player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
+                    player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 100))
+                    player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
 
-                    # score_screen = screen.display.geset_mode((960,150))
+                    # score_screen = screen.display.set_mode((960,150))
                     # score_screen_rect = score_screen.get_rect(center=(int(width/2), int(height/2)))
 
                     screen.fill(color.GREEN)
                     screen.blit( adi_logo, adi_logo_rect)
                     screen.blit(player1_txt, player1_txt_rect)
-                    #screen.blit(player2_txt, player2_txt_rect)
+                    screen.blit(player2_txt, player2_txt_rect)
                     
                     pygame.display.update()
                     while self.game_status == IN_GAME:
                         screen.fill(color.GREEN)
                         player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
-                        #player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
+                        player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
                         screen.fill(color.GREEN)
                         screen.blit( adi_logo, adi_logo_rect)
                         screen.blit(player1_txt, player1_txt_rect)
-                        #screen.blit(player2_txt, player2_txt_rect)
-                        # p1_screen = screen.blit(player1_score, player1_score_rect)
-                        # p2_screen = screen.blit(player2_score, player2_score_rect)
+                        screen.blit(player2_txt, player2_txt_rect)
+                        p1_screen = screen.blit(player1_score, player1_score_rect)
+                        p2_screen = screen.blit(player2_score, player2_score_rect)
                         screen.blit(player1_score, player1_score_rect)
-                        #screen.blit(player2_score, player2_score_rect)
+                        screen.blit(player2_score, player2_score_rect)
                 
                         # screens = [p1_screen, p2_screen]
                         pygame.display.update()
@@ -376,25 +377,14 @@ if __name__ == "__main__":
 
     print("Kinetic Tower Starting")
 
-    #os.putenv('SDL_VIDEODRIVER', 'fbcon')
-
     ## Setup Power Sensors
-    i2c_bus = board.I2C()
 
-    p2_ina219 = INA219(i2c_bus, addr=0x40)
-    #p1_ina219 = INA219(i2c_bus, addr=0x44)
-
-    # p1_ina219.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
-    # p1_ina219.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
-    # p1_ina219.bus_voltage_range = BusVoltageRange.RANGE_16V
-
-    p2_ina219.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
-    p2_ina219.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
-    p2_ina219.bus_voltage_range = BusVoltageRange.RANGE_16V
+    # Create instance of ADE9178
+    ade9187 = Ade9178()
 
     # Create Strip Objects
-    p2 = Player(player_ID='PLAYER 2', input_pin=24, power_sensor=p2_ina219)
-    p1 = Player(player_ID='PLAYER 1', input_pin=25, power_sensor=p2_ina219)
+    p1 = Player(player_ID='PLAYER 1', input_channel='A', power_sensor=ade9187)
+    p2 = Player(player_ID='PLAYER 2', input_channel='B', power_sensor=ade9187)
 
     game = KineticTowerGame()
 
@@ -514,8 +504,8 @@ if __name__ == "__main__":
                 #Gamewindow.show()
                 # Waits in loop as interrupts trigger while game is played
                 game_leds.animate()
-                p2.ina219_pwr_gen()
-                p1.ina219_pwr_gen()
+                p1.update_power_gen()
+                p2.update_power_gen()
 
                 game.p1_energy = p1.energy_gen
                 game.p2_energy = p2.energy_gen
@@ -546,7 +536,7 @@ if __name__ == "__main__":
                     print("\n\n\n")
                     game.winner = p2
                     game.not_winner = p1
-                    game.tot_energy = p1.energy_gen #+ p2.energy_gen
+                    game.tot_energy = p2.energy_gen #+ p2.energy_gen
                     game.game_status = RESULTS
                     game.game_duration = game_time
                     #print(LINE_UP, LINE_UP, LINE_CLEAR)
@@ -556,8 +546,8 @@ if __name__ == "__main__":
             print("Show Results")
             # Define Result LEDs - need to wait till after game has finished to determine leds for winner
             result_leds = AnimationGroup(
-                Blink(pixels, speed=0.5, color=color.GREEN)
-                #Blink(game.not_winner.pixel_map, speed=0.5, color=color.GREEN),
+                Blink(game.winner.pixel_map, speed=0.5, color=color.GREEN),
+                Blink(game.not_winner.pixel_map, speed=0.5, color=color.BLACK)
             )
             while game.game_status == RESULTS:
 
