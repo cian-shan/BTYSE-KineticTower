@@ -11,7 +11,8 @@ from adafruit_led_animation import helper
 from led_power_level import PowerLevel
 from player import Player
 from pixel_maps import KTPixelMap
-from score import Score
+# from score import Score
+from scoreClient import ScoreClient
 from adafruit_ina219 import ADCResolution, BusVoltageRange, INA219
 from csv import writer
 import os 
@@ -26,6 +27,8 @@ GET_INPUT = 1
 IN_GAME = 2
 RESULTS = 3
 FULL_BRIGHTNESS = 0.5
+
+BLINK_EVENT = pygame.USEREVENT + 0
 
 
 # When using full length strips
@@ -69,6 +72,7 @@ class KineticTowerGame:
         self.winner = winner
         self.not_winner = not_winner
         self.game_duration = game_duration
+        self.score_client = ScoreClient(game_name="Kinetic Tower", client_ip="192.168.7.40",host_ip="192.168.7.210")
 
     def game_start_button_callback(self, game):
         """
@@ -109,12 +113,12 @@ class KineticTowerGame:
         game_status 
         """
 
-        OFFLINE_MODE = True
+        ONLINE_MODE = True
 
         pygame.init()
         width = 1920
         height = 1080
-        screen = pygame.display.set_mode((width, height))#, pygame.FULLSCREEN)
+        screen = pygame.display.set_mode((width, height), pygame.FULLSCREEN)
         dialogue_font = pygame.font.Font('assets/research_remix.ttf', 70)
         score_font = pygame.font.Font('assets/research_remix.ttf', 50)
         adi_logo = pygame.image.load('assets/ADI_logo.png').convert()
@@ -129,23 +133,32 @@ class KineticTowerGame:
             while running:
                 
                 while self.game_status == STANDBY:
-                    
-                    leaderboard = Score()
+                    print("GUI in standby")
 
                     try:
 
-                        if OFFLINE_MODE is False:
+                        if ONLINE_MODE is True:
                             print("Attempting to get top 10")
-                            leaderboard_list = leaderboard.get_top_10()
-                            #time.sleep(0.1)
-                            print("KT LIST GOT: " + str(leaderboard_list))
+                            leaderboard_list = self.score_client.get_top_10()
 
                             if leaderboard_list is not None:
                         
                                 print(str(leaderboard_list))
+
+                                clock = pygame.time.Clock()
                                 
                                 leaderboard_title = dialogue_font.render('Leaderboard', True, color.WHITE)
                                 leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), 120))
+
+                                game_start_prompt = dialogue_font.render("Ready to play Kinetic Tower!", True, color.WHITE)
+                                game_start_prompt_rect = game_start_prompt.get_rect(center=(int(width/2), 980))
+
+                                off_text_surface = pygame.Surface(game_start_prompt_rect.size)
+                                off_text_surface.fill((0,0,0,0))
+
+                                blink_surfaces = cycle([game_start_prompt, off_text_surface])
+                                blink_surface = next(blink_surfaces)
+                                pygame.time.set_timer(BLINK_EVENT, 1000)
 
                                 header_name_list = ['Initials', 'School', 'Score']
                                 header_blit_list = []
@@ -178,7 +191,9 @@ class KineticTowerGame:
 
                                 screen.fill(color.BLACK)
                                 screen.blit(leaderboard_title, leaderboard_title_rect)
-                                screen.blit( adi_logo, adi_logo_rect)
+                                # screen.blit(game_start_prompt, game_start_prompt_rect)
+                                
+                                screen.blit(adi_logo, adi_logo_rect)
                                 screen.blits(header_blit_list)
                                 screen.blits(score_blit_list)
 
@@ -192,17 +207,24 @@ class KineticTowerGame:
                                             pygame.display.quit()
                                             pygame.quit()
                                             print("Got quit")
+                                        elif event.type == BLINK_EVENT:
+                                            blink_surface = next(blink_surfaces)
+                                            clock.tick(60)
                                         elif event.type == pygame.KEYDOWN and event.key == pygame.K_f: 
                                             print("Toggle Fullscreen")
                                             pygame.display.toggle_fullscreen()
                                         elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                                             print("Entering game with keyboard input")
                                             game.update_game_status(IN_GAME)
+                                    screen.blit(blink_surface, game_start_prompt_rect)
+                                    pygame.display.update()
+                                    clock.tick(60)
+                                    
                         else:
                             raise ConnectionError("Run Offline mode")
 
                     except ConnectionError:
-                        OFFLINE_MODE = True
+                        # ONLINE_MODE = False
                         print("Cannot connect to database - continuing with simple mode")
                         leaderboard_title = dialogue_font.render('Ready to Play Kinetic Tower!', True, color.WHITE)
                         leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), int(height/2)))
@@ -238,9 +260,6 @@ class KineticTowerGame:
 
                     player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 100))
                     player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
-
-                    # score_screen = screen.display.set_mode((960,150))
-                    # score_screen_rect = score_screen.get_rect(center=(int(width/2), int(height/2)))
 
                     screen.fill(color.GREEN)
                     screen.blit( adi_logo, adi_logo_rect)
@@ -318,7 +337,7 @@ class KineticTowerGame:
 
                         pygame.display.update()
 
-                        if 1:# if OFFLINE_MODE is False:
+                        if 1:# if ONLINE_MODE is True:
                             get_entry = 1
 
                             while get_entry == 1:
@@ -351,7 +370,7 @@ class KineticTowerGame:
                                     if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                                         print("GOT School name: ", input_entry_school.value)
                                         get_entry = 3
-                                        new_score = Score(entry_name=input_entry_name.value, school_name=input_entry_school.value, score=round(game.game_duration, 2))
+                                        new_score = self.score_client.submit_score(entry_name=input_entry_name.value, school_name=input_entry_school.value, score=round(game.game_duration, 2))
                                         try:
                                             new_score.submit_score()
                                             time.sleep(1)
@@ -400,12 +419,6 @@ if __name__ == "__main__":
         callback=game.game_start_button_callback,
         bouncetime=350
     )
-    # GPIO.add_event_detect(f
-    #     p1.input_pin, GPIO.FALLING, callback=p1.button_power_gen, bouncetime=200
-    # )
-    # GPIO.add_event_detect(
-    #     p2.input_pin, GPIO.FALLING, callback=p2.button_power_gen, bouncetime=200
-    # )
 
     #  Setup for LEDs
     pixels = neopixel.NeoPixel(
