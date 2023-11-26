@@ -90,7 +90,9 @@ class KineticTowerGame:
 
     def log_interaction():
         interaction = [time.asctime()]
-        with open('interactions_kinetic_tower.csv', 'a') as file:
+        filename = time.strftime("interactions_kinetic_tower_%d_%m_%Y.csv") 
+        print(f"Create file with name {filename}")
+        with open(filename, 'a') as file:
 
             interations = writer(file)
             interations.writerow(interaction)
