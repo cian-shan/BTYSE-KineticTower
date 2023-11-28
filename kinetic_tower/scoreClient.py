@@ -2,8 +2,16 @@ import socket
 import json
 import time
 import xmltodict
-from score import Score
 import time
+
+class Score:
+    def __init__(self, score_client, entry_name=None, school_name=None, score=None):
+        self.entry_name = entry_name
+        self.school_name = school_name
+        self.score = score
+        self.message_id = id(self)
+
+    list_of_scores = None
 
 
 class ScoreClient:
