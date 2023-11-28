@@ -26,7 +26,7 @@ STANDBY = 0
 GET_INPUT = 1
 IN_GAME = 2
 RESULTS = 3
-FULL_BRIGHTNESS = 0.5
+FULL_BRIGHTNESS = 1
 
 BLINK_EVENT = pygame.USEREVENT + 0
 
@@ -34,7 +34,7 @@ BLINK_EVENT = pygame.USEREVENT + 0
 # When using full length strips
 LED_COUNT = 1085
 LED_HEIGHT = 180
-GAME_WIN_LEVEL = 180
+GAME_WIN_LEVEL = 36
 
 # When using LED Matrix
 # LED_HEIGHT = 32
@@ -72,7 +72,7 @@ class KineticTowerGame:
         self.winner = winner
         self.not_winner = not_winner
         self.game_duration = game_duration
-        self.score_client = ScoreClient(game_name="Kinetic Tower", client_ip="192.168.7.40",host_ip="192.168.7.210")
+        self.score_client = ScoreClient(game_name="Kinetic Tower", client_ip="192.168.7.40", host_ip="192.168.7.210")
 
     def game_start_button_callback(self, game):
         """
@@ -162,7 +162,7 @@ class KineticTowerGame:
                                 blink_surface = next(blink_surfaces)
                                 pygame.time.set_timer(BLINK_EVENT, 1000)
 
-                                header_name_list = ['Initials', 'School', 'Score']
+                                header_name_list = ['Name', 'School', 'Score']
                                 header_blit_list = []
                                 item_width = width/5
                                 for item in header_name_list:
@@ -372,11 +372,10 @@ class KineticTowerGame:
                                     if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                                         print("GOT School name: ", input_entry_school.value)
                                         get_entry = 3
-                                        new_score = self.score_client.submit_score(entry_name=input_entry_name.value, school_name=input_entry_school.value, score=round(game.game_duration, 2))
                                         try:
-                                            new_score.submit_score()
-                                            time.sleep(1)
-                                        except:
+                                            new_score = self.score_client.submit_score(entry_name=input_entry_name.value, school_name=input_entry_school.value, score=round(game.game_duration, 2))
+                                            time.sleep(0.5)
+                                        except ConnectionError:
                                             print("Failed to submit score - continuing")
                                         game.update_game_status(STANDBY)
                         else:

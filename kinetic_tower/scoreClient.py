@@ -48,40 +48,41 @@ class ScoreClient:
         separator = "\r\n\r\n"
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.settimeout(3)
-            s.connect((self.host_ip, self.port))
-            data = xml.encode()  # data to send
-            meta = {}  # any metadata to include
-            dic = {"len": len(data), "s": "Normal", "md": meta}
-            header = json.dumps(dic)
-            # below sendall could combine into one
-            s.sendall(header.encode("utf-8"))
-            s.sendall(separator.encode("utf-8"))
-            s.sendall(data)
-            print(f"Score data sent:\n {xml}")
+            try:
+                s.settimeout(3)
+                s.connect((self.host_ip, self.port))
+                data = xml.encode()  # data to send
+                meta = {}  # any metadata to include
+                dic = {"len": len(data), "s": "Normal", "md": meta}
+                header = json.dumps(dic)
+                # below sendall could combine into one
+                s.sendall(header.encode("utf-8"))
+                s.sendall(separator.encode("utf-8"))
+                s.sendall(data)
+                print(f"Score data sent:\n {xml}")
 
-            # Get ack from server
-            ack_header = s.recv(1024)
-            ack_header_xml = ack_header.decode().strip()
-            clean_ack_header = ack_header_xml.replace("{\"s\":\"Normal\",\"len\":", "")
-            ack_header_len = clean_ack_header.replace("}", "")
-            ack = s.recv(int(ack_header_len))
+                # Get ack from server
+                ack_header = s.recv(1024)
+                ack_header_xml = ack_header.decode().strip()
+                clean_ack_header = ack_header_xml.replace("{\"s\":\"Normal\",\"len\":", "")
+                ack_header_len = clean_ack_header.replace("}", "")
+                ack = s.recv(int(ack_header_len))
 
-            ack_xml = ack.decode().strip()
-            ack_msg = xmltodict.parse(ack_xml, encoding="UTF-16")
-            ack_decode = ack_msg["MessageReceived"]
-            rx_msg_id = ack_decode["@Id"].replace("(", "")
-            rx_msg_id = rx_msg_id.replace(")", "")
+                ack_xml = ack.decode().strip()
+                ack_msg = xmltodict.parse(ack_xml, encoding="UTF-16")
+                ack_decode = ack_msg["MessageReceived"]
+                rx_msg_id = ack_decode["@Id"].replace("(", "")
+                rx_msg_id = rx_msg_id.replace(")", "")
 
-            if int(rx_msg_id) == int(new_score.message_id):
-                print("Ack received from server")
-                return True
-            else:
-                raise ConnectionError("No ack from server")
+                if int(rx_msg_id) == int(new_score.message_id):
+                    print("Ack received from server")
+                    return True
+                else:
+                    raise ConnectionError("No ack from server")
+            except Exception:
+                print("Cient failed to connect to server")
+
                 
-            
-
-
 
     def get_top_10(self):
         """
