@@ -444,7 +444,7 @@ if __name__ == "__main__":
     )
 
     p1_game_leds = PowerLevel(p1_pixel_map, color.ORANGE, max_height=LED_HEIGHT)
-    p2_game_leds = PowerLevel(p2_pixel_map, color.ORANGE, max_height=LED_HEIGHT)
+    p2_game_leds = PowerLevel(p2_pixel_map, color.PURPLE, max_height=LED_HEIGHT)
 
     test_leds = AnimationGroup(
         Blink(p1_pixel_map, speed=0.3, color=color.RED),
