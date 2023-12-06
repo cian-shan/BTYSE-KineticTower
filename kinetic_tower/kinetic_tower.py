@@ -72,8 +72,19 @@ class KineticTowerGame:
         self.winner = winner
         self.not_winner = not_winner
         self.game_duration = game_duration
-        self.score_client = ScoreClient(game_name="Kinetic Tower", client_ip="192.168.7.40", host_ip="192.168.7.210")
+        self.score_client = ScoreClient(game_name="Kinetic Tower", client_ip="192.168.176.40", host_ip="192.168.176.210")
         self.game_time = 0
+
+        self.pwr_gen_filename = time.strftime("power_gen_today_%d_%m_%Y.txt") 
+
+        if os.path.exists(self.pwr_gen_filename) is False:
+            file = open(self.pwr_gen_filename, 'w')
+            print(f"Create power gen file with name {self.pwr_gen_filename}")
+            file.write('0')
+            file.close()
+        else:
+            print(f"Using {self.pwr_gen_filename} for today's power gen")
+            
 
     def game_start_button_callback(self, game):
         """
@@ -122,10 +133,10 @@ class KineticTowerGame:
         width = 1920
         height = 1080
         screen = pygame.display.set_mode((width, height), pygame.FULLSCREEN)
-        dialogue_font = pygame.font.Font('assets/research_remix.ttf', 70)
+        dialogue_font = pygame.font.Font('assets/research_remix.ttf', 60)
         score_font = pygame.font.Font('assets/research_remix.ttf', 50)
-        adi_logo = pygame.image.load('assets/ADI_logo.png').convert()
-        adi_logo = pygame.transform.scale(adi_logo, (240,136))
+        adi_logo = pygame.image.load('assets/ADI-Logo-AWP-Tagline-KO-White.png').convert_alpha()
+        adi_logo = pygame.transform.scale(adi_logo, (325,200))
         adi_logo_rect = adi_logo.get_rect(topleft=(25,25))
         pygame.display.set_caption('Kinetic Tower')
         pygame.event.set_allowed([pygame.QUIT, pygame.K_RETURN])
@@ -149,11 +160,16 @@ class KineticTowerGame:
                                 print(str(leaderboard_list))
 
                                 clock = pygame.time.Clock()
-                                
-                                leaderboard_title = dialogue_font.render('Leaderboard', True, color.WHITE)
+                                pwr_today_float = 0
+                                with open(self.pwr_gen_filename, 'r+') as pwr_file:
+                                    pwr_today = pwr_file.read()
+                                    pwr_today_float = float(pwr_today)
+                                    print(f"Power Today {pwr_today_float}")
+    
+                                leaderboard_title = dialogue_font.render('PWR Gen Today: '+ str(round(pwr_today_float, 2)) + ' W', True, color.WHITE)
                                 leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), 120))
 
-                                game_start_prompt = dialogue_font.render("Ready to play Kinetic Tower!", True, color.WHITE)
+                                game_start_prompt = dialogue_font.render("Who can generate the most power?", True, color.WHITE)
                                 game_start_prompt_rect = game_start_prompt.get_rect(center=(int(width/2), 980))
 
                                 off_text_surface = pygame.Surface(game_start_prompt_rect.size)
@@ -576,6 +592,18 @@ if __name__ == "__main__":
                 Blink(game.winner.pixel_map, speed=0.5, color=color.GREEN),
                 Blink(game.not_winner.pixel_map, speed=0.5, color=color.BLACK)
             )
+
+            total_game_power = p1.energy_gen + p2.energy_gen
+
+            with open(game.pwr_gen_filename, 'r+') as pwr_file:
+                pwr_today = pwr_file.read()
+                pwr_today_val = float(pwr_today) + total_game_power
+                pwr_file.seek(0)
+                print(f"New Daily Total Power {pwr_today_val}")
+                pwr_file.write(str(pwr_today_val))
+                pwr_file.truncate()
+
+
             while game.game_status == RESULTS:
 
                 result_leds.animate()   
