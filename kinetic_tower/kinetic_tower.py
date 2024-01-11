@@ -72,7 +72,7 @@ class KineticTowerGame:
         self.winner = winner
         self.not_winner = not_winner
         self.game_duration = game_duration
-        self.score_client = ScoreClient(game_name="Kinetic Tower", client_ip="192.168.176.40", host_ip="192.168.176.210")
+        self.score_client = ScoreClient(game_name="Kinetic Tower", client_ip="169.254.102.64", host_ip="169.254.211.56")
         self.game_time = 0
 
         self.pwr_gen_filename = time.strftime("power_gen_today_%d_%m_%Y.txt") 
@@ -169,7 +169,7 @@ class KineticTowerGame:
                                 leaderboard_title = dialogue_font.render('PWR Gen Today: '+ str(round(pwr_today_float, 2)) + ' W', True, color.WHITE)
                                 leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), 120))
 
-                                game_start_prompt = dialogue_font.render("Who can generate the most power?", True, color.WHITE)
+                                game_start_prompt = dialogue_font.render("Who can generate 180 watts fast!!!", True, color.WHITE)
                                 game_start_prompt_rect = game_start_prompt.get_rect(center=(int(width/2), 980))
 
                                 off_text_surface = pygame.Surface(game_start_prompt_rect.size)
