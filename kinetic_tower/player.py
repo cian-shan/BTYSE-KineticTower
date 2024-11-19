@@ -38,9 +38,18 @@ class Player:
         """
         Read active power from ADE9178 and update player 
         """
-        self.energy_gen += self.power_sensor.get_active_power(self.input_channel)
-        # print(f"ADE9178 Power Reading {self.input_channel}: {self.energy_gen}")
-        self.player_leds.update_level(int(self.energy_gen))
+        self.energy_gen = self.power_sensor.get_active_power(self.input_channel)
+        print(f"emp Power Reading {self.input_channel}: {self.energy_gen}")
+        
+
+    def update_player_leds(self):
+        self.player_leds.update_level(int(self.energy_gen)*45)
+
+    
+    def get_power_reading(self):
+        self.energy_gen = self.power_sensor.get_active_power(self.input_channel)
+        print(f"EMP Power Reading {self.input_channel}: {self.energy_gen}")
+        # self.player_leds.update_level(int(self.energy_gen)*36)
 
 
 

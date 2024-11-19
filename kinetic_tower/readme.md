@@ -12,4 +12,4 @@
 	Run the make.sh shell script by running "bash make.sh" in the terminal
 #### To Run the program 
 1. Launch terminal inside the led_control directory
-2. Run 'sudo python led_control.py' - LED controls require admin access. 
+2. Run 'sudo python led_control.py' - LED controls require admin access.   

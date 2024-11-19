@@ -16,7 +16,7 @@ class PowerLevel(Animation):
         self.level = level
         super().__init__(pixel_object, speed=1, color=color, name=name)
 
-    def update_level(self, new_level):
+    def update_level(self,new_level):
         self.level = new_level 
 
     def reset(self):
@@ -24,9 +24,18 @@ class PowerLevel(Animation):
         return super().reset()
 
     def draw(self):
-        # print("LEVEL: ", self.level)
-        if self.level <= self.max_height:
-            fill_level = [self.color for i in range(self.level + 1)]
-            self.pixel_object[((self._num_pixels - 1) - self.level) :] = fill_level
+        print("LEVEL: ", self.level)
+        if self.level < self.max_height:
+            fill_level = [self.color for i in range(self.level)]
+            black_level = [color.MAGENTA for i in range(self.max_height - self.level)]
+
+            black_level.extend(fill_level)
+            print(f"fill len {len(fill_level)} - black {len(black_level)}")
+            print(fill_level)
+            self.pixel_object[:] = black_level
+
+            
+
         else:
-            self.pixel_object[((self._num_pixels - 1) - self.level) :] = self.max_height
+            max_level = [self.color] * 180
+            self.pixel_object[:] = max_level

@@ -1,6 +1,7 @@
 from pickle import NONE
 import board, neopixel, time
 import RPi.GPIO as GPIO
+import random
 from adafruit_led_animation.animation.blink import Blink
 from adafruit_led_animation.animation.solid import Solid
 from adafruit_led_animation.animation.rainbow import Rainbow
@@ -72,8 +73,19 @@ class KineticTowerGame:
         self.winner = winner
         self.not_winner = not_winner
         self.game_duration = game_duration
-        self.score_client = ScoreClient(game_name="Kinetic Tower", client_ip="192.168.7.40", host_ip="192.168.7.210")
+        self.score_client = ScoreClient(game_name="Kinetic Tower", client_ip="169.254.102.64", host_ip="169.254.211.56")
         self.game_time = 0
+
+        self.pwr_gen_filename = time.strftime("power_gen_today_%d_%m_%Y.txt") 
+
+        if os.path.exists(self.pwr_gen_filename) is False:
+            file = open(self.pwr_gen_filename, 'w')
+            print(f"Create power gen file with name {self.pwr_gen_filename}")
+            file.write('0')
+            file.close()
+        else:
+            print(f"Using {self.pwr_gen_filename} for today's power gen")
+            
 
     def game_start_button_callback(self, game):
         """
@@ -122,10 +134,10 @@ class KineticTowerGame:
         width = 1920
         height = 1080
         screen = pygame.display.set_mode((width, height), pygame.FULLSCREEN)
-        dialogue_font = pygame.font.Font('assets/research_remix.ttf', 70)
+        dialogue_font = pygame.font.Font('assets/research_remix.ttf', 60)
         score_font = pygame.font.Font('assets/research_remix.ttf', 50)
-        adi_logo = pygame.image.load('assets/ADI_logo.png').convert()
-        adi_logo = pygame.transform.scale(adi_logo, (240,136))
+        adi_logo = pygame.image.load('assets/ADI-Logo-AWP-Tagline-KO-White.png').convert_alpha()
+        adi_logo = pygame.transform.scale(adi_logo, (325,200))
         adi_logo_rect = adi_logo.get_rect(topleft=(25,25))
         pygame.display.set_caption('Kinetic Tower')
         pygame.event.set_allowed([pygame.QUIT, pygame.K_RETURN])
@@ -140,7 +152,7 @@ class KineticTowerGame:
 
                     try:
 
-                        if ONLINE_MODE is True:
+                        if ONLINE_MODE is False:
                             print("Attempting to get top 10")
                             leaderboard_list = self.score_client.get_top_10()
 
@@ -149,11 +161,16 @@ class KineticTowerGame:
                                 print(str(leaderboard_list))
 
                                 clock = pygame.time.Clock()
-                                
-                                leaderboard_title = dialogue_font.render('Leaderboard', True, color.WHITE)
+                                pwr_today_float = 0
+                                with open(self.pwr_gen_filename, 'r+') as pwr_file:
+                                    pwr_today = pwr_file.read()
+                                    pwr_today_float = float(pwr_today)
+                                    print(f"Power Today {pwr_today_float}")
+    
+                                leaderboard_title = dialogue_font.render('PWR Gen Today: '+ str(round(pwr_today_float, 2)) + ' W', True, color.WHITE)
                                 leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), 120))
 
-                                game_start_prompt = dialogue_font.render("Ready to play Kinetic Tower!", True, color.WHITE)
+                                game_start_prompt = dialogue_font.render("Who can generate 180 watts fast!!!", True, color.WHITE)
                                 game_start_prompt_rect = game_start_prompt.get_rect(center=(int(width/2), 980))
 
                                 off_text_surface = pygame.Surface(game_start_prompt_rect.size)
@@ -229,7 +246,7 @@ class KineticTowerGame:
                     except ConnectionError:
                         # ONLINE_MODE = False
                         print("Cannot connect to database - continuing with simple mode")
-                        leaderboard_title = dialogue_font.render('Ready to Play Kinetic Tower!', True, color.WHITE)
+                        leaderboard_title = dialogue_font.render('Ready to showcase Kinetic Tower!', True, color.WHITE)
                         leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), int(height/2)))
                         screen.fill(color.BLACK)
                         
@@ -253,51 +270,57 @@ class KineticTowerGame:
 
                 while self.game_status == IN_GAME:
                     
-                    player1_txt = dialogue_font.render('Player 1', True, color.BLACK)
-                    player2_txt = dialogue_font.render('Player 2', True, color.BLACK)
-                    player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
-                    player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
+                    player1_txt = dialogue_font.render('Power output (watts)', True, color.BLACK)
+                    # player2_txt = dialogue_font.render('Player 2', True, color.BLACK)
+                    player1_score = dialogue_font.render(str(self.p1_energy), True, color.BLACK)
+                    # player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
                     
-                    player1_txt_rect = player1_txt.get_rect(center=(int(width/4), int(height/2)))
-                    player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)))
+                    player1_txt_rect = player1_txt.get_rect(center=(int(width/2), int(height/2) - 100))
+                    # player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)))
 
-                    player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 100))
-                    player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
+                    player1_score_rect = player1_score.get_rect(center=(int((width/2) - 200), int(height/2) + 100))
+                    # player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
 
-                    time_txt = dialogue_font.render("Time", True, color.BLACK)
-                    time_txt_rect = time_txt.get_rect(center=(int(width/2), int(height/4)))
+                    # time_txt = dialogue_font.render("Time", True, color.BLACK)
+                    # time_txt_rect = time_txt.get_rect(center=(int(width/2), int(height/4)))
 
-                    game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
-                    time_rect = game_time.get_rect(center=(int(width/2)-60, int(height/4)+100)) 
+                    # game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
+                    # time_rect = game_time.get_rect(center=(int(width/2)-60, int(height/4)+100)) 
 
-                    screen.fill(color.GREEN)
+                    screen.fill(color.BLACK)
                     screen.blit(adi_logo, adi_logo_rect)
                     screen.blit(player1_txt, player1_txt_rect)
-                    screen.blit(player2_txt, player2_txt_rect)
-                    screen.blit(time_txt, time_txt_rect)
-                    screen.blit(game_time, time_rect)
+                    # screen.blit(player2_txt, player2_txt_rect)
+                    # screen.blit(time_txt, time_txt_rect)
+                    # screen.blit(game_time, time_rect)
                     
                     pygame.display.update()
                     while self.game_status == IN_GAME:
                         screen.fill(color.GREEN)
-                        player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
-                        player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
-                        game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
+                        energy = self.p1_energy
+
+                        if energy > 4: 
+                            energy_txt = "max"
+                        else:
+                            energy_txt = f"{self.p1_energy:8.3f}"
+                        player1_score = dialogue_font.render(energy_txt, True, color.BLACK)
+                        # player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.WHITE)
+                        # game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.WHITE)
                         screen.fill(color.GREEN)
                         screen.blit(adi_logo, adi_logo_rect)
                         screen.blit(player1_txt, player1_txt_rect)
-                        screen.blit(player2_txt, player2_txt_rect)
+                        # screen.blit(player2_txt, player2_txt_rect)
                         p1_screen = screen.blit(player1_score, player1_score_rect)
-                        p2_screen = screen.blit(player2_score, player2_score_rect)
-                        screen.blit(player2_txt, player2_txt_rect)
-                        screen.blit(time_txt, time_txt_rect)
-                        screen.blit(game_time, time_rect)
+                        # p2_screen = screen.blit(player2_score, player2_score_rect)
+                        # screen.blit(player2_txt, player2_txt_rect)
+                        # screen.blit(time_txt, time_txt_rect)
+                        # screen.blit(game_time, time_rect)
                         screen.blit(player1_score, player1_score_rect)
-                        screen.blit(player2_score, player2_score_rect)
+                        # screen.blit(player2_score, player2_score_rect)
                 
                         # screens = [p1_screen, p2_screen]
                         pygame.display.update()
-                        time.sleep(0.2)
+                        time.sleep(0.5)
                         
                         for event in pygame.event.get():
                             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -417,7 +440,7 @@ if __name__ == "__main__":
 
     # Create Strip Objects
     p1 = Player(player_ID='PLAYER 1', input_channel='A', power_sensor=ade9187)
-    p2 = Player(player_ID='PLAYER 2', input_channel='B', power_sensor=ade9187)
+    p2 = Player(player_ID='PLAYER 2', input_channel='A', power_sensor=ade9187)
 
     game = KineticTowerGame()
 
@@ -441,34 +464,36 @@ if __name__ == "__main__":
 
     #  Create instances of LEDs for each player - Maps LEDs to each player
     p1_pixel_map = helper.PixelMap(
-        pixels, KTPixelMap.p1_pixel_map_strips, individual_pixels=True
+        pixels, KTPixelMap.combined_pixel_map, individual_pixels=True
     )
-    p2_pixel_map = helper.PixelMap(
-        pixels, KTPixelMap.p2_pixel_map_strips, individual_pixels=True
-    )
+    # p2_pixel_map = helper.PixelMap(
+    #     pixels, KTPixelMap.p2_pixel_map_strips, individual_pixels=True
+    # )
 
     #  Create game 'Scenes' - what gets displayed on LEDs at different points in the game
     standby_leds = AnimationGroup(
-        Rainbow(p1_pixel_map, 0.1, 10), Rainbow(p2_pixel_map, 0.1, 10)
+        # Rainbow(p1_pixel_map, 0.1, 10), Rainbow(p2_pixel_map, 0.1, 10)
+        Rainbow(p1_pixel_map, 0.1, 10)
     )
 
     clear_leds = AnimationGroup(
-        Solid(p1_pixel_map, color.BLACK), Solid(p2_pixel_map, color.BLACK)
+        Solid(p1_pixel_map, color.BLACK)
     )
 
-    p1_game_leds = PowerLevel(p1_pixel_map, color.ORANGE, max_height=LED_HEIGHT)
-    p2_game_leds = PowerLevel(p2_pixel_map, color.PURPLE, max_height=LED_HEIGHT)
+    p1_game_leds = PowerLevel(p1_pixel_map, color.GREEN, max_height=LED_HEIGHT)
+    # p2_game_leds = PowerLevel(p2_pixel_map, color.BLUE, max_height=LED_HEIGHT)
 
     test_leds = AnimationGroup(
         Blink(p1_pixel_map, speed=0.3, color=color.RED),
-        Blink(p2_pixel_map, speed=0.3, color=color.GREEN),
+        # Blink(p2_pixel_map, speed=0.3, color=color.GREEN),
     )
 
     # Add the group of LEDs to the game
-    game_leds = AnimationGroup(p1_game_leds, p2_game_leds)
+    # game_leds = AnimationGroup(p1_game_leds, p2_game_leds)
+    game_leds = AnimationGroup(p1_game_leds)
 
     p1.add_leds(p1_game_leds, p1_pixel_map)
-    p2.add_leds(p2_game_leds, p2_pixel_map)
+    # p2.add_leds(p2_game_leds, p2_pixel_map)
     
 
     countdown_leds = AnimationSequence(
@@ -505,10 +530,21 @@ if __name__ == "__main__":
                 # test_leds.animate()
                 pass
             p1.reset()
-            p2.reset()
+            # p2.reset()
             pass
 
         # elif game.game_status == COUNTDOWN:
+        # Set power level goals;
+        # def generate_power_level(min_value, max_value):
+        #     return random.randint(min_value, max_value)
+
+        # # Example usage
+        # min_value = 1
+        # max_value = 100
+        # target_power_level = generate_power_level(min_value, max_value)
+        # print(f"The power level to reach is: {target_power_level}")
+        # # display power level goal on LED Bar
+
         #     # Set all LEDs to Countdown
         #     print("Countdown!")
         #     game.game_status = IN_GAME
@@ -530,14 +566,22 @@ if __name__ == "__main__":
             while game.game_status == IN_GAME:
                 #Gamewindow.show()
                 # Waits in loop as interrupts trigger while game is played
+                # clear_leds.animate()
                 game_leds.animate()
-                p1.update_power_gen()
-                p2.update_power_gen()
+                p1.get_power_reading()
+                print(f"energy {p1.energy_gen}")
+                # p2.energy_gen = p1.energy_gen
+                p1.update_player_leds()
+                # p2.update_player_leds()
+
+
+                # p2.update_power_gen()
 
                 game.p1_energy = p1.energy_gen
-                game.p2_energy = p2.energy_gen
 
-                game.game_time = time.time() - game_start_time
+                # game.p2_energy = p2.energy_gen
+
+                # game.game_time = time.time() - game_start_time
 
                 # # Print Progress
                 # print(f'Player 1: {p1.player_leds.level:8.2f}\nPlayer 2: {p2.player_leds.level:8.2f}\n', end = '')
@@ -548,6 +592,32 @@ if __name__ == "__main__":
 
                 # check for winner
                 # Somewhere the player have gotten mixed up, this will print the correct winner however
+                # Show position of target bar again
+                # def determine_winner(target_power_level, p1_energy_gen, p2_energy_gen):
+                #     if p1_energy_gen > target_power_level and p2_energy_gen > target_power_level:
+                #         return "It's a draw", target_power_level  # Both overloaded
+                #     Overloaded - flash LEDS & screen hazard....
+                #     elif p1_energy_gen > target_power_level:
+                #         return "Player 2 wins", p2_energy_gen  # P1 overloaded - Flash their LEDs
+                #     elif p2_energy_gen > target_power_level:
+                #         return "Player 1 wins", p1_energy_gen  # P2 overloaded - Flash their LEDs
+                #     else:
+                # Both are under or equal to target power level
+                #         if p1_energy_gen > p2_energy_gen:
+                #             return "Player 1 wins", p1_energy_gen # P1 Bar goes green, P2 Bar goes red
+                #         elif p2_energy_gen > p1_energy_gen:
+                #             return "Player 2 wins", p2_energy_gen # P2 Bar goes green, P1 Bar goes red
+                #         else:
+                #             return "It's a draw", p1_energy_gen  # Both are equal - both bars go green
+
+                # Test
+                # target_power_level = 50
+                # p1_energy_gen = 45
+                # p2_energy_gen = 55
+                # winner, energy_used = determine_winner(target_power_level, p1_energy_gen, p2_energy_gen)
+                # print(f"{winner} with {energy_used} energy")
+
+
                 if p1.energy_gen > GAME_WIN_LEVEL:
                     print("PLAYER 1 WIN") 
                     print("\n\n\n")
@@ -576,6 +646,18 @@ if __name__ == "__main__":
                 Blink(game.winner.pixel_map, speed=0.5, color=color.GREEN),
                 Blink(game.not_winner.pixel_map, speed=0.5, color=color.BLACK)
             )
+
+            total_game_power = p1.energy_gen + p2.energy_gen
+
+            with open(game.pwr_gen_filename, 'r+') as pwr_file:
+                pwr_today = pwr_file.read()
+                pwr_today_val = float(pwr_today) + total_game_power
+                pwr_file.seek(0)
+                print(f"New Daily Total Power {pwr_today_val}")
+                pwr_file.write(str(pwr_today_val))
+                pwr_file.truncate()
+
+
             while game.game_status == RESULTS:
 
                 result_leds.animate()   
