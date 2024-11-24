@@ -349,15 +349,15 @@ class KineticTowerGame:
                     score_txt = dialogue_font.render('Score', True, color.BLACK)
                     score_txt_rect = score_txt.get_rect(center=(int(width/2), int(height/2)))
 
-                    # score_value = dialogue_font.render(f"{game.game_duration:8.2f} s", True, color.BLACK)
-                    # score_value_rect = score_value.get_rect(center=(int(width/2), int(height/2) + 100))
+                    score_value = dialogue_font.render(game.winner.energy_gen, True, color.BLACK)
+                    score_value_rect = score_value.get_rect(center=(int(width/2), int(height/2) + 100))
 
                     screen.fill(color.GREEN)
                     screen.blit(adi_logo, adi_logo_rect)
                     screen.blit(winner_txt, winner_txt_rect)
                     screen.blit(winner_name, winner_name_rect)
                     screen.blit(score_txt, score_txt_rect)
-                    # screen.blit(score_value, score_value_rect)
+                    screen.blit(score_value, score_value_rect)
 
                     pygame.display.update()
                     # while self.game_status == RESULTS:
@@ -537,6 +537,7 @@ if __name__ == "__main__":
         Solid(pixels, color.BLACK),
     )
     
+    
     gui_thread = threading.Thread(target=game.gameplay_gui)
 
     # Start GUI thread outsde loop. Can only be started once
@@ -647,6 +648,12 @@ if __name__ == "__main__":
                 
         elif game.game_status == RESULTS:
             # Determine the winner based on the closest energy generation without exceeding the GAME_WIN_LEVEL
+            # Esc to Standby
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    print("Esc for Standby")
+                    game.update_game_status(STANDBY)
+
             if resultsprinted is False:
                 print("Show Results")
                 if p1.energy_gen <= GAME_WIN_LEVEL and p2.energy_gen <= GAME_WIN_LEVEL:
@@ -659,7 +666,7 @@ if __name__ == "__main__":
                         game.not_winner = p1
                         print("PLAYER 2 WINS")
                     else:
-                        game.winner = "None"
+                        game.winner = "Draw"
                         game.not_winner = None
                         print("GAME IS A DRAW")
                 elif p1.energy_gen <= GAME_WIN_LEVEL:
@@ -671,12 +678,15 @@ if __name__ == "__main__":
                     game.not_winner = p1
                     print("PLAYER 2 WINS")
                 else:
-                    game.winner = "None"
+                    game.winner = "Draw"
                     game.not_winner = None
-            
+                    print("GAME IS A DRAW")
+
             resultsprinted = True
 
-            # # Define Result LEDs - need to wait till after game has finished to determine leds for winner
+
+
+            # Define Result LEDs - need to wait till after game has finished to determine leds for winner
             # result_leds = AnimationGroup(
             #     Blink(game.winner.pixel_map, speed=0.5, color=color.GREEN),
             #     Blink(game.not_winner.pixel_map, speed=0.5, color=color.BLACK)
