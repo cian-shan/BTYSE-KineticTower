@@ -341,13 +341,13 @@ class KineticTowerGame:
                 while game.game_status == RESULTS:
                     # print("Showing Results GUI")
 
-                    winner_txt = dialogue_font.render('Winner', True, color.BLACK)
+                    winner_txt = dialogue_font.render('Winner:', True, color.BLACK)
                     winner_txt_rect = winner_txt.get_rect(center=(int(width/2), int(height/4)))
 
                     winner_name = dialogue_font.render(game.winner, True, color.BLACK)
                     winner_name_rect = winner_name.get_rect(center=(int(width/2), int(height/4) + 100))
 
-                    score_txt = dialogue_font.render('Score', True, color.BLACK)
+                    score_txt = dialogue_font.render('Winning Margin:', True, color.BLACK)
                     score_txt_rect = score_txt.get_rect(center=(int(width/2), int(height/2)))
 
                     score_value = dialogue_font.render(str(round(winning_margin, 2)), True, color.BLACK)
