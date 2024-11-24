@@ -32,6 +32,7 @@ RESULTS = 4
 FULL_BRIGHTNESS = 1
 
 BLINK_EVENT = pygame.USEREVENT + 0
+resultsprinted = False
 
 
 # Define the range for the game win level
@@ -337,7 +338,7 @@ class KineticTowerGame:
                                 game.update_game_status(STANDBY)
                         
                 while game.game_status == RESULTS:
-                    print("Showing Results GUI")
+                    # print("Showing Results GUI")
 
                     winner_txt = dialogue_font.render('Winner', True, color.BLACK)
                     winner_txt_rect = winner_txt.get_rect(center=(int(width/2), int(height/4)))
@@ -348,15 +349,15 @@ class KineticTowerGame:
                     score_txt = dialogue_font.render('Score', True, color.BLACK)
                     score_txt_rect = score_txt.get_rect(center=(int(width/2), int(height/2)))
 
-                    score_value = dialogue_font.render(f"{game.game_duration:8.2f} s", True, color.BLACK)
-                    score_value_rect = score_value.get_rect(center=(int(width/2), int(height/2) + 100))
+                    # score_value = dialogue_font.render(f"{game.game_duration:8.2f} s", True, color.BLACK)
+                    # score_value_rect = score_value.get_rect(center=(int(width/2), int(height/2) + 100))
 
                     screen.fill(color.GREEN)
                     screen.blit(adi_logo, adi_logo_rect)
                     screen.blit(winner_txt, winner_txt_rect)
                     screen.blit(winner_name, winner_name_rect)
                     screen.blit(score_txt, score_txt_rect)
-                    screen.blit(score_value, score_value_rect)
+                    # screen.blit(score_value, score_value_rect)
 
                     pygame.display.update()
                     # while self.game_status == RESULTS:
@@ -645,10 +646,9 @@ if __name__ == "__main__":
                 #     game.game_duration = game.game_time
                 
         elif game.game_status == RESULTS:
-            print("Show Results")
             # Determine the winner based on the closest energy generation without exceeding the GAME_WIN_LEVEL
-            resultsprinted = False
             if resultsprinted is False:
+                print("Show Results")
                 if p1.energy_gen <= GAME_WIN_LEVEL and p2.energy_gen <= GAME_WIN_LEVEL:
                     if abs(GAME_WIN_LEVEL - p1.energy_gen) < abs(GAME_WIN_LEVEL - p2.energy_gen):
                         game.winner = p1
@@ -659,7 +659,7 @@ if __name__ == "__main__":
                         game.not_winner = p1
                         print("PLAYER 2 WINS")
                     else:
-                        game.winner = None
+                        game.winner = "None"
                         game.not_winner = None
                         print("GAME IS A DRAW")
                 elif p1.energy_gen <= GAME_WIN_LEVEL:
@@ -671,7 +671,7 @@ if __name__ == "__main__":
                     game.not_winner = p1
                     print("PLAYER 2 WINS")
                 else:
-                    game.winner = None
+                    game.winner = "None"
                     game.not_winner = None
             
             resultsprinted = True
