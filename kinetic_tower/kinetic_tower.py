@@ -342,7 +342,7 @@ class KineticTowerGame:
                     winner_txt = dialogue_font.render('Winner', True, color.BLACK)
                     winner_txt_rect = winner_txt.get_rect(center=(int(width/2), int(height/4)))
 
-                    winner_name = dialogue_font.render(game.winner.player_ID, True, color.BLACK)
+                    winner_name = dialogue_font.render(game.winner, True, color.BLACK)
                     winner_name_rect = winner_name.get_rect(center=(int(width/2), int(height/4) + 100))
 
                     score_txt = dialogue_font.render('Score', True, color.BLACK)
@@ -351,7 +351,7 @@ class KineticTowerGame:
                     score_value = dialogue_font.render(f"{game.game_duration:8.2f} s", True, color.BLACK)
                     score_value_rect = score_value.get_rect(center=(int(width/2), int(height/2) + 100))
 
-                    screen.fill(color.YELLOW)
+                    screen.fill(color.GREEN)
                     screen.blit(adi_logo, adi_logo_rect)
                     screen.blit(winner_txt, winner_txt_rect)
                     screen.blit(winner_name, winner_name_rect)
@@ -359,10 +359,10 @@ class KineticTowerGame:
                     screen.blit(score_value, score_value_rect)
 
                     pygame.display.update()
-                    while self.game_status == RESULTS:
-                        for event in pygame.event.get():
-                            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                                game.update_game_status(STANDBY)
+                    # while self.game_status == RESULTS:
+                    #     for event in pygame.event.get():
+                    #          if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    #              game.update_game_status(STANDBY)
 
                     # results_color = next(color_pool)
 
@@ -647,6 +647,7 @@ if __name__ == "__main__":
         elif game.game_status == RESULTS:
             print("Show Results")
             # Determine the winner based on the closest energy generation without exceeding the GAME_WIN_LEVEL
+            resultsprinted = False
             if resultsprinted is False:
                 if p1.energy_gen <= GAME_WIN_LEVEL and p2.energy_gen <= GAME_WIN_LEVEL:
                     if abs(GAME_WIN_LEVEL - p1.energy_gen) < abs(GAME_WIN_LEVEL - p2.energy_gen):
