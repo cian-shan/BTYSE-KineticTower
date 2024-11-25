@@ -339,99 +339,124 @@ class KineticTowerGame:
                 while game.game_status == RESULTS:
                     print("Showing Results GUI")
 
-                    results_color = next(color_pool)
+                    winner_txt = dialogue_font.render('Winner', True, color.BLACK)
+                    winner_txt_rect = winner_txt.get_rect(center=(int(width/2), int(height/4)))
 
-                    results_title = dialogue_font.render('Results', True, results_color)
-                    results_title_rect = results_title.get_rect(center=(int(width/2), 120))
+                    winner_name = dialogue_font.render(game.winner.player_ID, True, color.BLACK)
+                    winner_name_rect = winner_name.get_rect(center=(int(width/2), int(height/4) + 100))
 
-                    results_color = next(color_pool)
+                    score_txt = dialogue_font.render('Score', True, color.BLACK)
+                    score_txt_rect = score_txt.get_rect(center=(int(width/2), int(height/2)))
 
-                    winner_title = score_font.render("Winner!", True,results_color)
-                    winner_title_rect = winner_title.get_rect(center=(int(width/3), int(height/4)))
+                    score_value = dialogue_font.render(f"{game.game_duration:8.2f} s", True, color.BLACK)
+                    score_value_rect = score_value.get_rect(center=(int(width/2), int(height/2) + 100))
 
-                    winner_value = score_font.render(str(game.winner.player_ID), True, results_color)
-                    winner_value_rect = winner_value.get_rect(center=(int(width/3), int(height/4)+50))
+                    screen.fill(color.YELLOW)
+                    screen.blit(adi_logo, adi_logo_rect)
+                    screen.blit(winner_txt, winner_txt_rect)
+                    screen.blit(winner_name, winner_name_rect)
+                    screen.blit(score_txt, score_txt_rect)
+                    screen.blit(score_value, score_value_rect)
 
-                    results_color = next(color_pool)
+                    pygame.display.update()
+                    while self.game_status == RESULTS:
+                        for event in pygame.event.get():
+                            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                                game.update_game_status(STANDBY)
 
-                    score_txt = score_font.render("Score (s)", True, results_color)
-                    score_txt_rect = score_txt.get_rect(center=(int((2*width)/3), int(height/4)))
+                    # results_color = next(color_pool)
+
+                    # results_title = dialogue_font.render('Results', True, results_color)
+                    # results_title_rect = results_title.get_rect(center=(int(width/2), 120))
+
+                    # results_color = next(color_pool)
+
+                    # winner_title = score_font.render("Winner!", True,results_color)
+                    # winner_title_rect = winner_title.get_rect(center=(int(width/3), int(height/4)))
+
+                    # winner_value = score_font.render(str(game.winner.player_ID), True, results_color)
+                    # winner_value_rect = winner_value.get_rect(center=(int(width/3), int(height/4)+50))
+
+                    # results_color = next(color_pool)
+
+                    # score_txt = score_font.render("Score (s)", True, results_color)
+                    # score_txt_rect = score_txt.get_rect(center=(int((2*width)/3), int(height/4)))
                         
-                    score_value = score_font.render(f"{game.game_duration:8.2f}", True, results_color)
-                    score_value_rect = score_value.get_rect(center=(int((2*width)/3), int(height/4)+50))
+                    # score_value = score_font.render(f"{game.game_duration:8.2f}", True, results_color)
+                    # score_value_rect = score_value.get_rect(center=(int((2*width)/3), int(height/4)+50))
 
-                    results_blits = [(results_title, results_title_rect), (winner_title, winner_title_rect), (winner_value, winner_value_rect), (score_txt, score_txt_rect), (score_value, score_value_rect) ]
+                    # results_blits = [(results_title, results_title_rect), (winner_title, winner_title_rect), (winner_value, winner_value_rect), (score_txt, score_txt_rect), (score_value, score_value_rect) ]
                     
-                    name_color = next(color_pool)
-                    school_color = next(color_pool)
+                    # name_color = next(color_pool)
+                    # school_color = next(color_pool)
 
-                    while game.game_status == RESULTS:
+                    # while game.game_status == RESULTS:
 
-                        # Get info from user
-                        input_entry_name = pygame_textinput.TextInputVisualizer(font_color=name_color, font_object=dialogue_font, cursor_color=color.WHITE)
-                        input_entry_name.value = 'Entry'
-                        input_entry_school = pygame_textinput.TextInputVisualizer(font_color=school_color, font_object=dialogue_font, cursor_color=color.WHITE)
-                        input_entry_school.value = 'School'
+                    #     # Get info from user
+                    #     input_entry_name = pygame_textinput.TextInputVisualizer(font_color=name_color, font_object=dialogue_font, cursor_color=color.WHITE)
+                    #     input_entry_name.value = 'Entry'
+                    #     input_entry_school = pygame_textinput.TextInputVisualizer(font_color=school_color, font_object=dialogue_font, cursor_color=color.WHITE)
+                    #     input_entry_school.value = 'School'
 
-                        name_rect = input_entry_name.surface.get_rect(center = (int(width/2), int(height/2)))
-                        school_rect = input_entry_school.surface.get_rect(center = (int(width/2), int(height/2)+100))
+                    #     name_rect = input_entry_name.surface.get_rect(center = (int(width/2), int(height/2)))
+                    #     school_rect = input_entry_school.surface.get_rect(center = (int(width/2), int(height/2)+100))
                         
-                        screen.fill(color.BLACK)
+                    #     screen.fill(color.BLACK)
                         
-                        screen.blits(results_blits)
-                        screen.blit(adi_logo, adi_logo_rect)
+                    #     screen.blits(results_blits)
+                    #     screen.blit(adi_logo, adi_logo_rect)
                         
-                        # screen.blit(input_entry_school.surface, school_rect)
+                    #     # screen.blit(input_entry_school.surface, school_rect)
 
-                        pygame.display.update()
+                    #     pygame.display.update()
 
-                        if 1:# if ONLINE_MODE is True:
-                            get_entry = 1
+                    #     if 1:# if ONLINE_MODE is True:
+                    #         get_entry = 1
 
-                            while get_entry == 1:
-                                screen.fill(color.BLACK)
-                                screen.blit(input_entry_name.surface, name_rect)
-                                screen.blits(results_blits)
-                                screen.blit(adi_logo, adi_logo_rect)
-                                events = pygame.event.get()
+                    #         while get_entry == 1:
+                    #             screen.fill(color.BLACK)
+                    #             screen.blit(input_entry_name.surface, name_rect)
+                    #             screen.blits(results_blits)
+                    #             screen.blit(adi_logo, adi_logo_rect)
+                    #             events = pygame.event.get()
 
-                                input_entry_name.update(events)
-                                pygame.display.update()
+                    #             input_entry_name.update(events)
+                    #             pygame.display.update()
 
-                                for event in events:
-                                    if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                                        print("GOT Entry name: ", input_entry_name.value)
-                                        get_entry = 2
+                    #             for event in events:
+                    #                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    #                     print("GOT Entry name: ", input_entry_name.value)
+                    #                     get_entry = 2
                             
 
-                            while get_entry == 2:
-                                screen.fill(color.BLACK)
-                                screen.blit(input_entry_name.surface, name_rect)
-                                screen.blit(input_entry_school.surface, school_rect)
-                                screen.blits(results_blits)
-                                screen.blit(adi_logo, adi_logo_rect)
-                                events = pygame.event.get()
-                                input_entry_school.update(events)
-                                pygame.display.update()
+                    #         while get_entry == 2:
+                    #             screen.fill(color.BLACK)
+                    #             screen.blit(input_entry_name.surface, name_rect)
+                    #             screen.blit(input_entry_school.surface, school_rect)
+                    #             screen.blits(results_blits)
+                    #             screen.blit(adi_logo, adi_logo_rect)
+                    #             events = pygame.event.get()
+                    #             input_entry_school.update(events)
+                    #             pygame.display.update()
 
-                                for event in events:                 
-                                    if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                                        print("GOT School name: ", input_entry_school.value)
-                                        get_entry = 3
-                                        try:
-                                            new_score = self.score_client.submit_score(entry_name=input_entry_name.value, school_name=input_entry_school.value, score=round(game.game_duration, 2))
-                                            time.sleep(0.5)
-                                        except ConnectionError:
-                                            print("Failed to submit score - continuing")
-                                        game.update_game_status(STANDBY)
-                        else:
-                            while game.game_status == RESULTS:
-                                events = pygame.event.get()
+                    #             for event in events:                 
+                    #                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    #                     print("GOT School name: ", input_entry_school.value)
+                    #                     get_entry = 3
+                    #                     try:
+                    #                         new_score = self.score_client.submit_score(entry_name=input_entry_name.value, school_name=input_entry_school.value, score=round(game.game_duration, 2))
+                    #                         time.sleep(0.5)
+                    #                     except ConnectionError:
+                    #                         print("Failed to submit score - continuing")
+                    #                     game.update_game_status(STANDBY)
+                    #     else:
+                    #         while game.game_status == RESULTS:
+                    #             events = pygame.event.get()
 
-                                # Don't print score entry if in offline mode - press enter to start new game
-                                for event in events:                 
-                                    if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                                        game.update_game_status(STANDBY)
+                    #             # Don't print score entry if in offline mode - press enter to start new game
+                    #             for event in events:                 
+                    #                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    #                     game.update_game_status(STANDBY)
                                                     
                         
         # Clean up GUI displays     
@@ -648,8 +673,7 @@ if __name__ == "__main__":
             else:
                 game.winner = None
                 game.not_winner = None
-                print("GAME IS A DRAW")
-                
+
             # # Define Result LEDs - need to wait till after game has finished to determine leds for winner
             # result_leds = AnimationGroup(
             #     Blink(game.winner.pixel_map, speed=0.5, color=color.GREEN),
