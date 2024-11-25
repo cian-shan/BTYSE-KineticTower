@@ -83,7 +83,7 @@ class KineticTowerGame:
         self.not_winner = not_winner
         self.game_duration = game_duration
         self.score_client = ScoreClient(game_name="Kinetic Tower", client_ip="169.254.102.64", host_ip="169.254.211.56")
-        self.game_time = 45
+        self.game_time = 0
 
         self.pwr_gen_filename = time.strftime("power_gen_today_%d_%m_%Y.txt") 
 
@@ -105,7 +105,7 @@ class KineticTowerGame:
             if self.game_status == STANDBY:
                 print("Game Start Button Pressed")
                 self.game_status = COUNTDOWN
-                self.game_status = IN_GAME
+                #self.game_status = IN_GAME
             else:
                 print("Game Ended with button press")
                 self.game_status = STANDBY
@@ -245,7 +245,7 @@ class KineticTowerGame:
                                         elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                                             print("Entering game with keyboard input")
                                             game.update_game_status(COUNTDOWN)
-                                            game.update_game_status(IN_GAME)
+                                            #game.update_game_status(IN_GAME)
                                     screen.blit(blink_surface, game_start_prompt_rect)
                                     pygame.display.update()
                                     clock.tick(60)
@@ -276,7 +276,7 @@ class KineticTowerGame:
                                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                                     print("Entering game with keyboard input")
                                     game.update_game_status(COUNTDOWN)
-                                    game.update_game_status(IN_GAME)
+                                    #game.update_game_status(IN_GAME)
                         
 
                 while self.game_status == IN_GAME:
@@ -531,7 +531,7 @@ if __name__ == "__main__":
             #print(RESET)
             
             print("Entering Standby")
-            print("Who can generate the closest to {GAME_WIN_LEVEL}?!")
+            print(f"Who can generate the closest to {GAME_WIN_LEVEL}?!")
             while game.game_status == STANDBY:
                 standby_leds.animate()
                 
@@ -585,6 +585,12 @@ if __name__ == "__main__":
 
                 game.game_time = time.time() - game_start_time
 
+                # Go to results
+                for event in pygame.event.get():
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                        print("Return for Results")
+                        game.update_game_status(RESULTS)
+
                 # # Print Progress
                 # print(f'Player 1: {p1.player_leds.level:8.2f}\nPlayer 2: {p2.player_leds.level:8.2f}\n', end = '')
                 # print(f'Game Score: {game_time:8.2f}', end='')
@@ -594,25 +600,25 @@ if __name__ == "__main__":
 
                 # check for winner
                 # Somewhere the player have gotten mixed up, this will print the correct winner however
-                if p1.energy_gen > GAME_WIN_LEVEL:
-                    print("PLAYER 1 WIN") 
-                    print("\n\n\n")
-                    game.winner = p1
-                    game.not_winner = p2
-                    game.tot_energy = p1.energy_gen #+ p2.energy_gen
-                    game.game_status = RESULTS
-                    game.game_duration = game.game_time
-                    #print(LINE_UP, LINE_UP, LINE_CLEAR)
+                # if p1.energy_gen > GAME_WIN_LEVEL:
+                #     print("PLAYER 1 WIN") 
+                #     print("\n\n\n")
+                #     game.winner = p1
+                #     game.not_winner = p2
+                #     game.tot_energy = p1.energy_gen #+ p2.energy_gen
+                #     game.game_status = RESULTS
+                #     game.game_duration = game.game_time
+                #     #print(LINE_UP, LINE_UP, LINE_CLEAR)
 
-                elif p2.energy_gen > GAME_WIN_LEVEL:
-                    print("PLAYER 2 WIN")
-                    print("\n\n\n")
-                    game.winner = p2
-                    game.not_winner = p1
-                    game.tot_energy = p2.energy_gen #+ p2.energy_gen
-                    game.game_status = RESULTS
-                    game.game_duration = game.game_time
-                    #print(LINE_UP, LINE_UP, LINE_CLEAR)
+                # elif p2.energy_gen > GAME_WIN_LEVEL:
+                #     print("PLAYER 2 WIN")
+                #     print("\n\n\n")
+                #     game.winner = p2
+                #     game.not_winner = p1
+                #     game.tot_energy = p2.energy_gen #+ p2.energy_gen
+                #     game.game_status = RESULTS
+                #     game.game_duration = game.game_time
+                
                 
                 
         elif game.game_status == RESULTS:
