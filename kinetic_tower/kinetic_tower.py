@@ -32,9 +32,6 @@ RESULTS = 4
 FULL_BRIGHTNESS = 1
 
 BLINK_EVENT = pygame.USEREVENT + 0
-resultsprinted = False
-winning_margin = 0
-
 
 # Define the range for the game win level
 MIN_LEVEL = 100
@@ -74,6 +71,8 @@ class KineticTowerGame:
         winner=NONE,
         not_winner=NONE,
         game_duration=NONE
+        resultsprinted = False
+        winning_margin = 0
     ):
 
         self.game_start_pin = game_start_pin
@@ -159,6 +158,7 @@ class KineticTowerGame:
             while running:
                 
                 while self.game_status == STANDBY:
+                    resultsprinted = False
                     print("GUI in standby")
 
                     try:
@@ -531,12 +531,12 @@ if __name__ == "__main__":
     p2.add_leds(p2_game_leds, p2_pixel_map)
     
 
-    countdown_leds = AnimationSequence(
-        Solid(pixels, color.RED),
-        Solid(pixels, color.ORANGE),
-        Solid(pixels, color.GREEN),
-        Solid(pixels, color.BLACK),
-    )
+    # countdown_leds = AnimationSequence(
+    #     Solid(pixels, color.RED),
+    #     Solid(pixels, color.ORANGE),
+    #     Solid(pixels, color.GREEN),
+    #     Solid(pixels, color.BLACK),
+    # )
     
     
     gui_thread = threading.Thread(target=game.gameplay_gui)
@@ -571,19 +571,26 @@ if __name__ == "__main__":
 
         elif game.game_status == COUNTDOWN:
             # Set all LEDs to Countdown
-            print("Countdown and show GAME_WIN_LEVEL")
-            time.sleep(1)
-            print("3")
-            time.sleep(1)
-            print("2")
-            time.sleep(1)
-            print("GAME_WIN_LEVEL: ", GAME_WIN_LEVEL)
-            time.sleep(1)
-            print("1")
-            time.sleep(1)
-            print("GO!!!")
-            #run game_countdown from led_control.py
-            game.game_status = IN_GAME
+                def activate_countdown_leds(level):
+                    for i in range(level):
+                        if i < len(KTPixelMap.p1_pixel_map_strips):
+                            pixels[KTPixelMap.p1_pixel_map_strips[i]] = color.GREEN
+                            if i < len(KTPixelMap.p2_pixel_map_strips):
+                                pixels[KTPixelMap.p2_pixel_map_strips[i]] = color.GREEN
+                                activate_countdown_leds(GAME_WIN_LEVEL)
+                                print("Countdown and show GAME_WIN_LEVEL")
+                                time.sleep(1)
+                                print("3")
+                                time.sleep(1)
+                                print("2")
+                                time.sleep(1)
+                                print("GAME_WIN_LEVEL: ", GAME_WIN_LEVEL)
+                                time.sleep(1)
+                                print("1")
+                                time.sleep(1)
+                                print("GO!!!")
+                                #run game_countdown from led_control.py
+                                game.game_status = IN_GAME
 
             
             # for i in range(0,3):
