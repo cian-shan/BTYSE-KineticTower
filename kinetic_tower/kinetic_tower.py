@@ -644,35 +644,36 @@ if __name__ == "__main__":
                 #     game.game_status = RESULTS
                 #     game.game_duration = game.game_time
                 
-                
-                
         elif game.game_status == RESULTS:
             print("Show Results")
             # Determine the winner based on the closest energy generation without exceeding the GAME_WIN_LEVEL
-            if p1.energy_gen <= GAME_WIN_LEVEL and p2.energy_gen <= GAME_WIN_LEVEL:
-                if abs(GAME_WIN_LEVEL - p1.energy_gen) < abs(GAME_WIN_LEVEL - p2.energy_gen):
+            if resultsprinted is False:
+                if p1.energy_gen <= GAME_WIN_LEVEL and p2.energy_gen <= GAME_WIN_LEVEL:
+                    if abs(GAME_WIN_LEVEL - p1.energy_gen) < abs(GAME_WIN_LEVEL - p2.energy_gen):
+                        game.winner = p1
+                        game.not_winner = p2
+                        print("PLAYER 1 WINS")
+                    elif abs(GAME_WIN_LEVEL - p2.energy_gen) < abs(GAME_WIN_LEVEL - p1.energy_gen):
+                        game.winner = p2
+                        game.not_winner = p1
+                        print("PLAYER 2 WINS")
+                    else:
+                        game.winner = None
+                        game.not_winner = None
+                        print("GAME IS A DRAW")
+                elif p1.energy_gen <= GAME_WIN_LEVEL:
                     game.winner = p1
                     game.not_winner = p2
                     print("PLAYER 1 WINS")
-                elif abs(GAME_WIN_LEVEL - p2.energy_gen) < abs(GAME_WIN_LEVEL - p1.energy_gen):
+                elif p2.energy_gen <= GAME_WIN_LEVEL:
                     game.winner = p2
                     game.not_winner = p1
                     print("PLAYER 2 WINS")
                 else:
                     game.winner = None
                     game.not_winner = None
-                    print("GAME IS A DRAW")
-            elif p1.energy_gen <= GAME_WIN_LEVEL:
-                game.winner = p1
-                game.not_winner = p2
-                print("PLAYER 1 WINS")
-            elif p2.energy_gen <= GAME_WIN_LEVEL:
-                game.winner = p2
-                game.not_winner = p1
-                print("PLAYER 2 WINS")
-            else:
-                game.winner = None
-                game.not_winner = None
+            
+            resultsprinted = True
 
             # # Define Result LEDs - need to wait till after game has finished to determine leds for winner
             # result_leds = AnimationGroup(
