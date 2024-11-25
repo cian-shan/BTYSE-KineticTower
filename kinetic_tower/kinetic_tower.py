@@ -70,8 +70,8 @@ class KineticTowerGame:
         tot_energy=0,
         winner=NONE,
         not_winner=NONE,
-        game_duration=NONE
-        resultsprinted = False
+        game_duration=NONE,
+        resultsprinted = False,
         winning_margin = 0
     ):
 
