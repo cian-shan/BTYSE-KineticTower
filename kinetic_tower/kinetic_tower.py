@@ -33,6 +33,7 @@ FULL_BRIGHTNESS = 1
 
 BLINK_EVENT = pygame.USEREVENT + 0
 resultsprinted = False
+winning_margin = 0
 
 
 # Define the range for the game win level
