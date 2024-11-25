@@ -623,30 +623,57 @@ if __name__ == "__main__":
                 
         elif game.game_status == RESULTS:
             print("Show Results")
-            # Define Result LEDs - need to wait till after game has finished to determine leds for winner
-            result_leds = AnimationGroup(
-                Blink(game.winner.pixel_map, speed=0.5, color=color.GREEN),
-                Blink(game.not_winner.pixel_map, speed=0.5, color=color.BLACK)
-            )
+            # Determine the winner based on the closest energy generation without exceeding the GAME_WIN_LEVEL
+            if p1.energy_gen <= GAME_WIN_LEVEL and p2.energy_gen <= GAME_WIN_LEVEL:
+                if abs(GAME_WIN_LEVEL - p1.energy_gen) < abs(GAME_WIN_LEVEL - p2.energy_gen):
+                    game.winner = p1
+                    game.not_winner = p2
+                    print("PLAYER 1 WINS")
+                elif abs(GAME_WIN_LEVEL - p2.energy_gen) < abs(GAME_WIN_LEVEL - p1.energy_gen):
+                    game.winner = p2
+                    game.not_winner = p1
+                    print("PLAYER 2 WINS")
+                else:
+                    game.winner = None
+                    game.not_winner = None
+                    print("GAME IS A DRAW")
+            elif p1.energy_gen <= GAME_WIN_LEVEL:
+                game.winner = p1
+                game.not_winner = p2
+                print("PLAYER 1 WINS")
+            elif p2.energy_gen <= GAME_WIN_LEVEL:
+                game.winner = p2
+                game.not_winner = p1
+                print("PLAYER 2 WINS")
+            else:
+                game.winner = None
+                game.not_winner = None
+                print("GAME IS A DRAW")
+                
+            # # Define Result LEDs - need to wait till after game has finished to determine leds for winner
+            # result_leds = AnimationGroup(
+            #     Blink(game.winner.pixel_map, speed=0.5, color=color.GREEN),
+            #     Blink(game.not_winner.pixel_map, speed=0.5, color=color.BLACK)
+            # )
 
-            total_game_power = p1.energy_gen + p2.energy_gen
+            # total_game_power = p1.energy_gen + p2.energy_gen
 
-            with open(game.pwr_gen_filename, 'r+') as pwr_file:
-                pwr_today = pwr_file.read()
-                pwr_today_val = float(pwr_today) + total_game_power
-                pwr_file.seek(0)
-                print(f"New Daily Total Power {pwr_today_val}")
-                pwr_file.write(str(pwr_today_val))
-                pwr_file.truncate()
+            # with open(game.pwr_gen_filename, 'r+') as pwr_file:
+            #     pwr_today = pwr_file.read()
+            #     pwr_today_val = float(pwr_today) + total_game_power
+            #     pwr_file.seek(0)
+            #     print(f"New Daily Total Power {pwr_today_val}")
+            #     pwr_file.write(str(pwr_today_val))
+            #     pwr_file.truncate()
 
 
-            while game.game_status == RESULTS:
+            # while game.game_status == RESULTS:
 
-                result_leds.animate()   
+            #     result_leds.animate()   
 
-                # print("\nGame over!")
-                # print(GREEN, "Winner :", self.winner.player_ID)
-                # print(GREEN, f"Score  : {self.game_duration:8.2f} s")
+            #     # print("\nGame over!")
+            #     # print(GREEN, "Winner :", self.winner.player_ID)
+            #     # print(GREEN, f"Score  : {self.game_duration:8.2f} s")
         
         else:
             print("Exit Program - should not be reached")
