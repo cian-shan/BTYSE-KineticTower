@@ -349,7 +349,7 @@ class KineticTowerGame:
                     score_txt = dialogue_font.render('Score', True, color.BLACK)
                     score_txt_rect = score_txt.get_rect(center=(int(width/2), int(height/2)))
 
-                    score_value = dialogue_font.render(game.winner.energy_gen, True, color.BLACK)
+                    score_value = dialogue_font.render(str(round(winning_margin, 2)), True, color.BLACK)
                     score_value_rect = score_value.get_rect(center=(int(width/2), int(height/2) + 100))
 
                     screen.fill(color.GREEN)
@@ -660,26 +660,32 @@ if __name__ == "__main__":
                     if abs(GAME_WIN_LEVEL - p1.energy_gen) < abs(GAME_WIN_LEVEL - p2.energy_gen):
                         game.winner = p1
                         game.not_winner = p2
+                        winning_margin = abs(GAME_WIN_LEVEL - p1.energy_gen)    
                         print("PLAYER 1 WINS")
                     elif abs(GAME_WIN_LEVEL - p2.energy_gen) < abs(GAME_WIN_LEVEL - p1.energy_gen):
                         game.winner = p2
                         game.not_winner = p1
+                        winning_margin = abs(GAME_WIN_LEVEL - p2.energy_gen)
                         print("PLAYER 2 WINS")
                     else:
-                        game.winner = "Draw"
+                        game.winner = p1
                         game.not_winner = None
+                        winning_margin = abs(GAME_WIN_LEVEL - p1.energy_gen)
                         print("GAME IS A DRAW")
                 elif p1.energy_gen <= GAME_WIN_LEVEL:
                     game.winner = p1
                     game.not_winner = p2
+                    winning_margin = abs(GAME_WIN_LEVEL - p1.energy_gen)
                     print("PLAYER 1 WINS")
                 elif p2.energy_gen <= GAME_WIN_LEVEL:
                     game.winner = p2
                     game.not_winner = p1
+                    winning_margin = abs(GAME_WIN_LEVEL - p2.energy_gen)
                     print("PLAYER 2 WINS")
                 else:
-                    game.winner = "Draw"
+                    game.winner = p1
                     game.not_winner = None
+                    winning_margin = abs(GAME_WIN_LEVEL - p1.energy_gen)
                     print("GAME IS A DRAW")
 
             resultsprinted = True
