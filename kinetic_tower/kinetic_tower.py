@@ -20,26 +20,36 @@ from itertools import cycle
 import threading 
 import pygame
 import pygame_textinput
+import random
+import time
 from ade9178_driver import Ade9178
 
 STANDBY = 0
 GET_INPUT = 1
-IN_GAME = 2
-RESULTS = 3
+COUNTDOWN = 2
+IN_GAME = 3
+RESULTS = 4
 FULL_BRIGHTNESS = 1
 
 BLINK_EVENT = pygame.USEREVENT + 0
 
 
+# Define the range for the game win level
+MIN_LEVEL = 100
+MAX_LEVEL = 180
+
 # When using full length strips
 LED_COUNT = 1085
 LED_HEIGHT = 180
-GAME_WIN_LEVEL = 180
+# Generate a random game win level
+GAME_WIN_LEVEL = random.randint(MIN_LEVEL, MAX_LEVEL)
+print(f"Game Win Level: {GAME_WIN_LEVEL}")
 
 # When using LED Matrix
 # LED_HEIGHT = 32
 # LED_COUNT = 256
-# GAME_WIN_LEVEL = 11
+# Generate a random game win level
+#GAME_WIN_LEVEL = random.randint(MIN_LEVEL, MAX_LEVEL)
 
 LINE_UP = u"\u001b[1A"
 LINE_CLEAR = u"\u001b[1K"
@@ -73,7 +83,7 @@ class KineticTowerGame:
         self.not_winner = not_winner
         self.game_duration = game_duration
         self.score_client = ScoreClient(game_name="Kinetic Tower", client_ip="169.254.102.64", host_ip="169.254.211.56")
-        self.game_time = 0
+        self.game_time = 45
 
         self.pwr_gen_filename = time.strftime("power_gen_today_%d_%m_%Y.txt") 
 
@@ -94,7 +104,7 @@ class KineticTowerGame:
         if not GPIO.input(self.game_start_pin):
             if self.game_status == STANDBY:
                 print("Game Start Button Pressed")
-                #self.game_status = COUNTDOWN
+                self.game_status = COUNTDOWN
                 self.game_status = IN_GAME
             else:
                 print("Game Ended with button press")
@@ -123,11 +133,11 @@ class KineticTowerGame:
     def gameplay_gui(self):
         """
         This function creates all of the elements of the Kinetic Tower GUI
-        It runs in a Thead and stays in sync with the main game code using the games
+        It runs in a Thread and stays in sync with the main game code using the games
         game_status 
         """
 
-        ONLINE_MODE = True
+        ONLINE_MODE = False
 
         pygame.init()
         width = 1920
@@ -169,7 +179,7 @@ class KineticTowerGame:
                                 leaderboard_title = dialogue_font.render('PWR Gen Today: '+ str(round(pwr_today_float, 2)) + ' W', True, color.WHITE)
                                 leaderboard_title_rect = leaderboard_title.get_rect(center=(int(width/2), 120))
 
-                                game_start_prompt = dialogue_font.render("Who can generate 180 watts fast!!!", True, color.WHITE)
+                                game_start_prompt = dialogue_font.render(f"Who can generate the closest to {GAME_WIN_LEVEL}?!", True, color.WHITE)
                                 game_start_prompt_rect = game_start_prompt.get_rect(center=(int(width/2), 980))
 
                                 off_text_surface = pygame.Surface(game_start_prompt_rect.size)
@@ -234,6 +244,7 @@ class KineticTowerGame:
                                             pygame.display.toggle_fullscreen()
                                         elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                                             print("Entering game with keyboard input")
+                                            game.update_game_status(COUNTDOWN)
                                             game.update_game_status(IN_GAME)
                                     screen.blit(blink_surface, game_start_prompt_rect)
                                     pygame.display.update()
@@ -264,6 +275,7 @@ class KineticTowerGame:
                                     pygame.display.toggle_fullscreen()
                                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                                     print("Entering game with keyboard input")
+                                    game.update_game_status(COUNTDOWN)
                                     game.update_game_status(IN_GAME)
                         
 
@@ -284,7 +296,10 @@ class KineticTowerGame:
                     time_txt_rect = time_txt.get_rect(center=(int(width/2), int(height/4)))
 
                     game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
-                    time_rect = game_time.get_rect(center=(int(width/2)-60, int(height/4)+100)) 
+                    time_rect = game_time.get_rect(center=(int(width/2)-60, int(height/4)+100))
+
+                    game_win = dialogue_font.render(f"Game Win Level: {GAME_WIN_LEVEL}", True, color.BLACK)
+                    game_win_rect = game_win.get_rect(center=(int(width/2), int(height/4)+200))
 
                     screen.fill(color.GREEN)
                     screen.blit(adi_logo, adi_logo_rect)
@@ -292,6 +307,7 @@ class KineticTowerGame:
                     screen.blit(player2_txt, player2_txt_rect)
                     screen.blit(time_txt, time_txt_rect)
                     screen.blit(game_time, time_rect)
+                    screen.blit(game_win, game_win_rect)
                     
                     pygame.display.update()
                     while self.game_status == IN_GAME:
@@ -308,6 +324,7 @@ class KineticTowerGame:
                         screen.blit(player2_txt, player2_txt_rect)
                         screen.blit(time_txt, time_txt_rect)
                         screen.blit(game_time, time_rect)
+                        screen.blit(game_win, game_win_rect)
                         screen.blit(player1_score, player1_score_rect)
                         screen.blit(player2_score, player2_score_rect)
                 
@@ -411,7 +428,7 @@ class KineticTowerGame:
                             while game.game_status == RESULTS:
                                 events = pygame.event.get()
 
-                                # Don't print socre entry if in offline mode - press enter to start new game
+                                # Don't print score entry if in offline mode - press enter to start new game
                                 for event in events:                 
                                     if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                                         game.update_game_status(STANDBY)
@@ -475,7 +492,7 @@ if __name__ == "__main__":
     p1_game_leds = PowerLevel(p1_pixel_map, color.ORANGE, max_height=LED_HEIGHT)
     p2_game_leds = PowerLevel(p2_pixel_map, color.PURPLE, max_height=LED_HEIGHT)
 
-    test_leds = AnimationGroup(
+    test_leds = AnimationGroup( 
         Blink(p1_pixel_map, speed=0.3, color=color.RED),
         Blink(p2_pixel_map, speed=0.3, color=color.GREEN),
     )
@@ -514,7 +531,7 @@ if __name__ == "__main__":
             #print(RESET)
             
             print("Entering Standby")
-            print("Who can generate the power needed in the stortest time?!")
+            print("Who can generate the closest to {GAME_WIN_LEVEL}?!")
             while game.game_status == STANDBY:
                 standby_leds.animate()
                 
@@ -524,18 +541,31 @@ if __name__ == "__main__":
             p2.reset()
             pass
 
-        # elif game.game_status == COUNTDOWN:
-        #     # Set all LEDs to Countdown
-        #     print("Countdown!")
-        #     game.game_status = IN_GAME
-        #     for i in range(0,3):
-        #         countdown_leds.activate(i)
-        #         countdown_leds.animate()
-        #         print(4-(i+1))
-        #         time.sleep(.75)
-        #     countdown_leds.freeze()
-        #     pass
-        #     pass
+        elif game.game_status == COUNTDOWN:
+            # Set all LEDs to Countdown
+            print("Countdown and show GAME_WIN_LEVEL")
+            time.sleep(1)
+            print("3")
+            time.sleep(1)
+            print("2")
+            time.sleep(1)
+            print("GAME_WIN_LEVEL: ", GAME_WIN_LEVEL)
+            time.sleep(1)
+            print("1")
+            time.sleep(1)
+            print("GO!!!")
+            #run game_countdown from led_control.py
+            game.game_status = IN_GAME
+
+            
+            # for i in range(0,3):
+            #     countdown_leds.activate(i)
+            #     countdown_leds.animate()
+            #     print(4-(i+1))
+            #     time.sleep(.75)
+            # countdown_leds.freeze()
+            # pass
+            # pass
 
         elif game.game_status == IN_GAME:
             print("GO!!!")

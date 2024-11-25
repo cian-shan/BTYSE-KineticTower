@@ -93,9 +93,10 @@ def standby(self):
 
 
 # Game Countdown function
-def game_countdown(self):
+def game_countdown(game, GAME_WIN_LEVEL, p1_pixel_map_strips, p2_pixel_map_strips):
     """
     Runs Game countdown animation. LEDs flash during countdown
+    Lights the corresponding strip of LEDs for the given GAME_WIN_LEVEL
     """
     wait = 0.75
     # RED
@@ -110,7 +111,13 @@ def game_countdown(self):
     np.fill([255, 255, 0])
     time.sleep(wait)
 
+    # Light the corresponding strip of LEDs for the given GAME_WIN_LEVEL
+    for i in range(GAME_WIN_LEVEL):
+        for led in p1_pixel_map_strips[i] + p2_pixel_map_strips[i]:
+            np[led] = (0, 255, 0)
+
     # GREEN
+    time.sleep(2.0)
     np.fill([0, 255, 0])
     time.sleep(wait)
 
