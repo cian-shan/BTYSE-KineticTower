@@ -26,6 +26,7 @@ class GameWinLevel(Animation):
     def draw(self):
         # print("LEVEL: ", self.level)
         fill_level = [self.color for i in range(self.level + 1)]
+        self.level = self.level*2
         self.pixel_object[self.level] = self.color
 
 
