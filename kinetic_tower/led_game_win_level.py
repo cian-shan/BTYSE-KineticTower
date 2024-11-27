@@ -26,8 +26,7 @@ class GameWinLevel(Animation):
     def draw(self):
         # print("LEVEL: ", self.level)
         fill_level = [self.color for i in range(self.level + 1)]
-        for i in range(self.level + 1):
-            self.pixel_object[i] = self.color
+        self.pixel_object[self.level] = self.color
 
 
                 # def activate_countdown_leds(level):
