@@ -9,6 +9,7 @@ from adafruit_led_animation.group import AnimationGroup
 from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_led_animation import helper
 from led_power_level import PowerLevel
+from led_game_win_level import GameWinLevel
 from player import Player
 from pixel_maps import KTPixelMap
 # from score import Score
@@ -518,6 +519,8 @@ if __name__ == "__main__":
 
     p1_game_leds = PowerLevel(p1_pixel_map, color.ORANGE, max_height=LED_HEIGHT)
     p2_game_leds = PowerLevel(p2_pixel_map, color.PURPLE, max_height=LED_HEIGHT)
+    p1_gamewinlevel = GameWinLevel(p1_pixel_map, color.RED, max_height=LED_HEIGHT)
+    p2_gamewinlevel = GameWinLevel(p2_pixel_map, color.RED, max_height=LED_HEIGHT)
 
     test_leds = AnimationGroup( 
         Blink(p1_pixel_map, speed=0.3, color=color.RED),
@@ -530,6 +533,8 @@ if __name__ == "__main__":
     p1.add_leds(p1_game_leds, p1_pixel_map)
     p2.add_leds(p2_game_leds, p2_pixel_map)
     
+    # Add the game win level LEDs to the game
+    game_winlevelleds = AnimationGroup(p1_gamewinlevel, p2_gamewinlevel)
 
     # countdown_leds = AnimationSequence(
     #     Solid(pixels, color.RED),
@@ -571,26 +576,23 @@ if __name__ == "__main__":
 
         elif game.game_status == COUNTDOWN:
             # Set all LEDs to Countdown
-                def activate_countdown_leds(level):
-                    for i in range(level):
-                        if i < len(KTPixelMap.p1_pixel_map_strips):
-                            pixels[KTPixelMap.p1_pixel_map_strips[i]] = color.GREEN
-                            if i < len(KTPixelMap.p2_pixel_map_strips):
-                                pixels[KTPixelMap.p2_pixel_map_strips[i]] = color.GREEN
-                                activate_countdown_leds(GAME_WIN_LEVEL)
-                                print("Countdown and show GAME_WIN_LEVEL")
-                                time.sleep(1)
-                                print("3")
-                                time.sleep(1)
-                                print("2")
-                                time.sleep(1)
-                                print("GAME_WIN_LEVEL: ", GAME_WIN_LEVEL)
-                                time.sleep(1)
-                                print("1")
-                                time.sleep(1)
-                                print("GO!!!")
-                                #run game_countdown from led_control.py
-                                game.game_status = IN_GAME
+            p1_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
+            p2_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
+            game_winlevelleds.animate()
+            
+            print("Countdown and show GAME_WIN_LEVEL")
+            time.sleep(1)
+            print("3")
+            time.sleep(1)
+            print("2")
+            time.sleep(1)
+            print("GAME_WIN_LEVEL: ", GAME_WIN_LEVEL)
+            time.sleep(1)
+            print("1")
+            time.sleep(1)
+            print("GO!!!")
+            #run game_countdown from led_control.py
+            game.game_status = IN_GAME
 
             
             # for i in range(0,3):
