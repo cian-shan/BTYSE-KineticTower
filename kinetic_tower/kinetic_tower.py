@@ -35,8 +35,8 @@ FULL_BRIGHTNESS = 1
 BLINK_EVENT = pygame.USEREVENT + 0
 
 # Define the range for the game win level
-MIN_LEVEL = 100
-MAX_LEVEL = 180
+MIN_LEVEL = 1
+MAX_LEVEL = 1
 
 # When using full length strips
 LED_COUNT = 1085
