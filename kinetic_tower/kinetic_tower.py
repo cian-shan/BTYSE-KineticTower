@@ -619,8 +619,8 @@ if __name__ == "__main__":
                 p1.update_power_gen()
                 p2.update_power_gen()
 
-                game.p1_energy = p1.energy_gen + p1.energy_gen
-                game.p2_energy = p2.energy_gen + p2.energy_gen
+                game.p1_energy = p1.energy_gen
+                game.p2_energy = p2.energy_gen
 
                 game.game_time = time.time() - game_start_time
 

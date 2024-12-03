@@ -69,7 +69,7 @@ class Ade9178:
         
         # print(f"Value = {active_power_watts}")
 
-        return active_power_watts
+        return active_power_watts*10
 
     def twos_comp_to_dec(self, value, bits):
         """
