@@ -24,12 +24,14 @@ class GameWinLevel(Animation):
         return super().reset()
 
     def draw(self):
-        # print("LEVEL: ", self.level)
-        # fill_level = [self.color for i in range(self.level + 1)]
-        # self.pixel_object[self.level] = self.color
-        for i in range(self.level + 1):
-            if i < self.level:
-                self.pixel_object[i] = self.color
+        print("LEVEL: ", self.level)
+        fill_level = [self.color for i in range(self.level + 1)]
+        self.pixel_object[(180-self.level)] = self.color
+        self.pixel_object[(181-self.level)] = self.color
+        self.pixel_object[(182-self.level)] = self.color
+        # for i in range(self.level + 1):
+        #     if i < self.level:
+        #         self.pixel_object[i] = self.color
 
                 # def activate_countdown_leds(level):
                 #     for i in range(level):

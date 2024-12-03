@@ -33,10 +33,11 @@ RESULTS = 4
 FULL_BRIGHTNESS = 1
 
 BLINK_EVENT = pygame.USEREVENT + 0
+winning_margin = 0
 
 # Define the range for the game win level
-MIN_LEVEL = 1
-MAX_LEVEL = 1
+MIN_LEVEL = 45
+MAX_LEVEL = 155
 
 # When using full length strips
 LED_COUNT = 1085
@@ -72,8 +73,6 @@ class KineticTowerGame:
         winner=NONE,
         not_winner=NONE,
         game_duration=NONE,
-        resultsprinted = False,
-        winning_margin = 0
     ):
 
         self.game_start_pin = game_start_pin
@@ -341,7 +340,6 @@ class KineticTowerGame:
                         
                 while game.game_status == RESULTS:
                     # print("Showing Results GUI")
-
                     winner_txt = dialogue_font.render('Winner:', True, color.BLACK)
                     winner_txt_rect = winner_txt.get_rect(center=(int(width/2), int(height/4)))
 
@@ -360,7 +358,7 @@ class KineticTowerGame:
                     screen.blit(winner_name, winner_name_rect)
                     screen.blit(score_txt, score_txt_rect)
                     screen.blit(score_value, score_value_rect)
-
+                    
                     pygame.display.update()
                     # while self.game_status == RESULTS:
                     #     for event in pygame.event.get():
@@ -657,12 +655,16 @@ if __name__ == "__main__":
                 #     game.game_duration = game.game_time
                 
         elif game.game_status == RESULTS:
+            game_winlevelleds.animate()
+            game_leds.animate()
             # Determine the winner based on the closest energy generation without exceeding the GAME_WIN_LEVEL
             # Esc to Standby
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     print("Esc for Standby")
                     game.update_game_status(STANDBY)
+
+            resultsprinted = False 
 
             if resultsprinted is False:
                 print("Show Results")
@@ -699,6 +701,8 @@ if __name__ == "__main__":
                     print("GAME IS A DRAW")
 
             resultsprinted = True
+
+            
 
 
 
