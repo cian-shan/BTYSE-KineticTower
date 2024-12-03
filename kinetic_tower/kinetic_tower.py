@@ -104,10 +104,7 @@ class KineticTowerGame:
         """
         if not GPIO.input(self.game_start_pin):
             if self.game_status == STANDBY:
-                GAME_WIN_LEVEL = random.randint(MIN_LEVEL, MAX_LEVEL)
-                print(f"Game Win Level: {GAME_WIN_LEVEL}")
                 print("Game Start Button Pressed")
-                time.sleep(0.2)
                 self.game_status = COUNTDOWN
                 #self.game_status = IN_GAME
             else:
@@ -577,6 +574,9 @@ if __name__ == "__main__":
             pass
 
         elif game.game_status == COUNTDOWN:
+            GAME_WIN_LEVEL = random.randint(MIN_LEVEL, MAX_LEVEL)
+            print(f"Game Win Level: {GAME_WIN_LEVEL}")
+            time.sleep(1)
             # Set all LEDs to Countdown
             p1_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
             p2_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
