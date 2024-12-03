@@ -104,7 +104,10 @@ class KineticTowerGame:
         """
         if not GPIO.input(self.game_start_pin):
             if self.game_status == STANDBY:
+                GAME_WIN_LEVEL = random.randint(MIN_LEVEL, MAX_LEVEL)
+                print(f"Game Win Level: {GAME_WIN_LEVEL}")
                 print("Game Start Button Pressed")
+                time.sleep(0.2)
                 self.game_status = COUNTDOWN
                 #self.game_status = IN_GAME
             else:
@@ -339,6 +342,7 @@ class KineticTowerGame:
                                 game.update_game_status(STANDBY)
                         
                 while game.game_status == RESULTS:
+                    time.sleep(1)
                     # print("Showing Results GUI")
                     winner_txt = dialogue_font.render('Winner:', True, color.BLACK)
                     winner_txt_rect = winner_txt.get_rect(center=(int(width/2), int(height/4)))
