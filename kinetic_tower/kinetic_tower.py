@@ -312,7 +312,11 @@ class KineticTowerGame:
                     # time_rect = game_time.get_rect(center=(int(width/2)-60, int(height/4)+100))
 
                     game_win = dialogue_font.render(f"Generate the required energy without going over!", True, color.BLACK)
+                    game_win2 = dialogue_font.render(f"without going over!", True, color.BLACK)
+
                     game_win_rect = game_win.get_rect(center=(int(width/2), int(height/4)+200))
+                    game_win2_rect = game_win2.get_rect(center=(int(width/2), int(height/4)+200))
+
 
                     screen.fill(color.GREEN)
                     screen.blit(adi_logo, adi_logo_rect)
@@ -338,6 +342,7 @@ class KineticTowerGame:
                         screen.blit(go_txt, go_txt_rect)
                         # screen.blit(game_time, time_rect)
                         screen.blit(game_win, game_win_rect)
+                        screen.blit(game_win2, game_win2_rect)
                         screen.blit(player1_score, player1_score_rect)
                         screen.blit(player2_score, player2_score_rect)
                 
