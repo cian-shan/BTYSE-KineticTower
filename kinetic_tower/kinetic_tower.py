@@ -282,7 +282,7 @@ class KineticTowerGame:
                                     
                 while self.game_status == COUNTDOWN:
                     
-                    countdown_values = ["4", "3", "2", "1", "GO!"]
+                    countdown_values = ["LEVEL:", "LEVEL:", "3","2", "1", "GO!"]
                     for value in countdown_values:
                         screen.fill(color.BLACK)
                         countdown_text = dialogue_font.render(value, True, color.WHITE)
