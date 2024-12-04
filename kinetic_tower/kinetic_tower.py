@@ -592,7 +592,7 @@ if __name__ == "__main__":
             p1_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
             p2_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
             game_winlevelleds.animate()
-            time.sleep(5)
+            time.sleep(4.5)
             
             print("Countdown and show GAME_WIN_LEVEL")
             print("GAME_WIN_LEVEL: ", GAME_WIN_LEVEL)
