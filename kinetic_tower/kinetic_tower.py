@@ -366,7 +366,7 @@ class KineticTowerGame:
                     score_txt = dialogue_font.render('Winning Margin:', True, color.BLACK)
                     score_txt_rect = score_txt.get_rect(center=(int(width/2), int(height/2)))
 
-                    score_value = dialogue_font.render(str(round(winning_margin, 2) + 'watts'), True, color.BLACK)
+                    score_value = dialogue_font.render(str(round(winning_margin, 2)) + ' watts', True, color.BLACK)
                     score_value_rect = score_value.get_rect(center=(int(width/2), int(height/2) + 100))
 
                     screen.fill(color.GREEN)
