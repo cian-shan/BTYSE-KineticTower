@@ -296,8 +296,8 @@ class KineticTowerGame:
                     
                     player1_txt = dialogue_font.render('Player 1', True, color.BLACK)
                     player2_txt = dialogue_font.render('Player 2', True, color.BLACK)
-                    player1_score = dialogue_font.render(str(int(self.p1_energy))' watts', True, color.BLACK)
-                    player2_score = dialogue_font.render(str(int(self.p2_energy))' watts', True, color.BLACK)
+                    player1_score = dialogue_font.render(str(int(self.p1_energy)) + ' watts', True, color.BLACK)
+                    player2_score = dialogue_font.render(str(int(self.p2_energy)) + ' watts', True, color.BLACK)
                     
                     player1_txt_rect = player1_txt.get_rect(center=(int(width/4), int(height/2)))
                     player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)))
