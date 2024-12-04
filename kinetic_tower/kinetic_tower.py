@@ -299,11 +299,11 @@ class KineticTowerGame:
                     player1_score = dialogue_font.render(str(int(self.p1_energy)) + ' watts', True, color.BLACK)
                     player2_score = dialogue_font.render(str(int(self.p2_energy)) + ' watts', True, color.BLACK)
                     
-                    player1_txt_rect = player1_txt.get_rect(center=(int(width/4), int(height/2)))
-                    player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)))
+                    player1_txt_rect = player1_txt.get_rect(center=(int(width/4), int(height/2)+100))
+                    player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)+100))
 
-                    player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 100))
-                    player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
+                    player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 200))
+                    player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 200))
 
                     go_txt = dialogue_font.render("GO!", True, color.BLACK)
                     go_txt_rect = go_txt.get_rect(center=(int(width/2), int(height/4)))
@@ -311,10 +311,10 @@ class KineticTowerGame:
                     # game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
                     # time_rect = game_time.get_rect(center=(int(width/2)-60, int(height/4)+100))
 
-                    game_win = dialogue_font.render(f"Generate the required energy without going over!", True, color.BLACK)
-                    game_win2 = dialogue_font.render(f"without going over!", True, color.BLACK)
+                    game_win = dialogue_font.render(f"Generate the energy required", True, color.BLACK)
+                    game_win2 = dialogue_font.render(f"without going over", True, color.BLACK)
 
-                    game_win_rect = game_win.get_rect(center=(int(width/2), int(height/4)+200))
+                    game_win_rect = game_win.get_rect(center=(int(width/2), int(height/4)+150))
                     game_win2_rect = game_win2.get_rect(center=(int(width/2), int(height/4)+200))
 
 
@@ -366,7 +366,7 @@ class KineticTowerGame:
                     score_txt = dialogue_font.render('Winning Margin:', True, color.BLACK)
                     score_txt_rect = score_txt.get_rect(center=(int(width/2), int(height/2)))
 
-                    score_value = dialogue_font.render(str(round(winning_margin, 2)), True, color.BLACK)
+                    score_value = dialogue_font.render(str(round(winning_margin, 2) + 'watts'), True, color.BLACK)
                     score_value_rect = score_value.get_rect(center=(int(width/2), int(height/2) + 100))
 
                     screen.fill(color.GREEN)
@@ -597,7 +597,7 @@ if __name__ == "__main__":
             p1_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
             p2_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
             game_winlevelleds.animate()
-            time.sleep(4.9)
+            time.sleep(4.8)
             
             print("Countdown and show GAME_WIN_LEVEL")
             print("GAME_WIN_LEVEL: ", GAME_WIN_LEVEL)
