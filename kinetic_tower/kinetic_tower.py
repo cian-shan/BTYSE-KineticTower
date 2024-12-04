@@ -279,7 +279,18 @@ class KineticTowerGame:
                                     print("Entering game with keyboard input")
                                     game.update_game_status(COUNTDOWN)
                                     #game.update_game_status(IN_GAME)
-                        
+                                    
+                while self.game_status == COUNTDOWN:
+                    
+                    countdown_values = ["4", "3", "2", "1", "GO!"]
+                    for value in countdown_values:
+                        screen.fill(color.BLACK)
+                        countdown_text = dialogue_font.render(value, True, color.WHITE)
+                        countdown_rect = countdown_text.get_rect(center=(int(width/2), int(height/2)))
+                        screen.blit(countdown_text, countdown_rect)
+                        pygame.display.update()
+                        time.sleep(1)
+                    
 
                 while self.game_status == IN_GAME:
                     
