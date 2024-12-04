@@ -516,8 +516,8 @@ if __name__ == "__main__":
         Solid(p1_pixel_map, color.BLACK), Solid(p2_pixel_map, color.BLACK)
     )
 
-    p1_game_leds = PowerLevel(p1_pixel_map, color.ORANGE, max_height=LED_HEIGHT)
-    p2_game_leds = PowerLevel(p2_pixel_map, color.PURPLE, max_height=LED_HEIGHT)
+    p1_game_leds = PowerLevel(p1_pixel_map, color.BLUE, max_height=LED_HEIGHT)
+    p2_game_leds = PowerLevel(p2_pixel_map, color.GREEN, max_height=LED_HEIGHT)
     p1_gamewinlevel = GameWinLevel(p1_pixel_map, color.RED, max_height=LED_HEIGHT)
     p2_gamewinlevel = GameWinLevel(p2_pixel_map, color.RED, max_height=LED_HEIGHT)
 

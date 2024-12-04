@@ -14,7 +14,7 @@ class PowerLevel(Animation):
         self._num_pixels = len(pixel_object)
         self.max_height = max_height
         self.level = level
-        super().__init__(pixel_object, speed=0.05, color=color, name=name)  # Lower speed value for faster animation
+        super().__init__(pixel_object, speed=0.005, color=color, name=name)  # Lower speed value for faster animation
 
     def update_level(self, new_level):
         self.level = new_level 
