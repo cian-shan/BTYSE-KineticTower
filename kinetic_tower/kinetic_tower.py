@@ -171,7 +171,7 @@ class KineticTowerGame:
                         
                                 print(str(leaderboard_list))
 
-                                clock = pygame.time.Clock()
+                                # clock = pygame.time.Clock()
                                 pwr_today_float = 0
                                 with open(self.pwr_gen_filename, 'r+') as pwr_file:
                                     pwr_today = pwr_file.read()
@@ -189,7 +189,7 @@ class KineticTowerGame:
 
                                 blink_surfaces = cycle([game_start_prompt, off_text_surface])
                                 blink_surface = next(blink_surfaces)
-                                pygame.time.set_timer(BLINK_EVENT, 1000)
+                                # pygame.time.set_timer(BLINK_EVENT, 1000)
 
                                 header_name_list = ['Name', 'School', 'Score']
                                 header_blit_list = []
@@ -282,7 +282,7 @@ class KineticTowerGame:
                                     
                 while self.game_status == COUNTDOWN:
                     
-                    countdown_values = ["The Power Level Required is...", "The Power Level Required is...","3", "2", "1"]
+                    countdown_values = ["The Energy Required is...", "The Energy Required is...","3", "2", "1"]
                     for value in countdown_values:
                         screen.fill(color.BLACK)
                         countdown_text = dialogue_font.render(value, True, color.WHITE)
@@ -305,11 +305,11 @@ class KineticTowerGame:
                     player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 100))
                     player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 100))
 
-                    time_txt = dialogue_font.render("Time", True, color.BLACK)
-                    time_txt_rect = time_txt.get_rect(center=(int(width/2), int(height/4)))
+                    # time_txt = dialogue_font.render("Time", True, color.BLACK)
+                    # time_txt_rect = time_txt.get_rect(center=(int(width/2), int(height/4)))
 
-                    game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
-                    time_rect = game_time.get_rect(center=(int(width/2)-60, int(height/4)+100))
+                    # game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
+                    # time_rect = game_time.get_rect(center=(int(width/2)-60, int(height/4)+100))
 
                     game_win = dialogue_font.render(f"Power Needed: {GAME_WIN_LEVEL} watts", True, color.BLACK)
                     game_win_rect = game_win.get_rect(center=(int(width/2), int(height/4)+200))
@@ -318,8 +318,8 @@ class KineticTowerGame:
                     screen.blit(adi_logo, adi_logo_rect)
                     screen.blit(player1_txt, player1_txt_rect)
                     screen.blit(player2_txt, player2_txt_rect)
-                    screen.blit(time_txt, time_txt_rect)
-                    screen.blit(game_time, time_rect)
+                    # screen.blit(time_txt, time_txt_rect)
+                    # screen.blit(game_time, time_rect)
                     screen.blit(game_win, game_win_rect)
                     
                     pygame.display.update()
@@ -327,7 +327,7 @@ class KineticTowerGame:
                         screen.fill(color.GREEN)
                         player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
                         player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
-                        game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
+                        # game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
                         screen.fill(color.GREEN)
                         screen.blit(adi_logo, adi_logo_rect)
                         screen.blit(player1_txt, player1_txt_rect)
@@ -335,8 +335,8 @@ class KineticTowerGame:
                         p1_screen = screen.blit(player1_score, player1_score_rect)
                         p2_screen = screen.blit(player2_score, player2_score_rect)
                         screen.blit(player2_txt, player2_txt_rect)
-                        screen.blit(time_txt, time_txt_rect)
-                        screen.blit(game_time, time_rect)
+                        # screen.blit(time_txt, time_txt_rect)
+                        # screen.blit(game_time, time_rect)
                         screen.blit(game_win, game_win_rect)
                         screen.blit(player1_score, player1_score_rect)
                         screen.blit(player2_score, player2_score_rect)
@@ -350,7 +350,7 @@ class KineticTowerGame:
                                 game.update_game_status(STANDBY)
                         
                 while game.game_status == RESULTS:
-                    time.sleep(1)
+                    time.sleep(0.5)
                     # print("Showing Results GUI")
                     winner_txt = dialogue_font.render('Winner:', True, color.BLACK)
                     winner_txt_rect = winner_txt.get_rect(center=(int(width/2), int(height/4)))
@@ -592,7 +592,7 @@ if __name__ == "__main__":
             p1_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
             p2_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
             game_winlevelleds.animate()
-            time.sleep(4.5)
+            time.sleep(4.9)
             
             print("Countdown and show GAME_WIN_LEVEL")
             print("GAME_WIN_LEVEL: ", GAME_WIN_LEVEL)
@@ -613,7 +613,7 @@ if __name__ == "__main__":
             print("GO!!!")
             KineticTowerGame.log_interaction()
             clear_leds.animate()
-            game_start_time = time.time()
+            # game_start_time = time.time()
 
             while game.game_status == IN_GAME:
                 #Gamewindow.show()
@@ -625,7 +625,7 @@ if __name__ == "__main__":
                 game.p1_energy = p1.energy_gen
                 game.p2_energy = p2.energy_gen
 
-                game.game_time = time.time() - game_start_time
+                # game.game_time = time.time() - game_start_time
 
                 # Go to results
                 for event in pygame.event.get():
