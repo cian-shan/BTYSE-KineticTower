@@ -282,7 +282,7 @@ class KineticTowerGame:
                                     
                 while self.game_status == COUNTDOWN:
                     
-                    countdown_values = ["Power Level Required is...", "Power Level Required is...:", "Power Level Required is...","3", "2", "1"]
+                    countdown_values = ["The Power Level Required is...", "The Power Level Required is...", "The Power Level Required is...","3", "2", "1"]
                     for value in countdown_values:
                         screen.fill(color.BLACK)
                         countdown_text = dialogue_font.render(value, True, color.WHITE)
@@ -587,11 +587,12 @@ if __name__ == "__main__":
         elif game.game_status == COUNTDOWN:
             GAME_WIN_LEVEL = random.randint(MIN_LEVEL, MAX_LEVEL)
             print(f"Game Win Level: {GAME_WIN_LEVEL}")
-            time.sleep(1)
+            time.sleep(0.5)
             # Set all LEDs to Countdown
             p1_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
             p2_gamewinlevel.update_gamewinlevel(GAME_WIN_LEVEL)
             game_winlevelleds.animate()
+            time.sleep(4)
             
             print("Countdown and show GAME_WIN_LEVEL")
             print("GAME_WIN_LEVEL: ", GAME_WIN_LEVEL)
