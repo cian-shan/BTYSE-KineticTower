@@ -329,8 +329,8 @@ class KineticTowerGame:
                     pygame.display.update()
                     while self.game_status == IN_GAME:
                         screen.fill(color.GREEN)
-                        player1_score = dialogue_font.render(str(int(self.p1_energy)), True, color.BLACK)
-                        player2_score = dialogue_font.render(str(int(self.p2_energy)), True, color.BLACK)
+                        player1_score = dialogue_font.render(str(int(self.p1_energy)) + ' watts', True, color.BLACK)
+                        player2_score = dialogue_font.render(str(int(self.p2_energy)) + ' watts', True, color.BLACK)
                         # game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
                         screen.fill(color.GREEN)
                         screen.blit(adi_logo, adi_logo_rect)
