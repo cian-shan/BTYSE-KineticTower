@@ -36,8 +36,8 @@ BLINK_EVENT = pygame.USEREVENT + 0
 winning_margin = 0
 
 # Define the range for the game win level
-MIN_LEVEL = 45
-MAX_LEVEL = 155
+MIN_LEVEL = 70
+MAX_LEVEL = 165
 
 # When using full length strips
 LED_COUNT = 1085
@@ -294,19 +294,19 @@ class KineticTowerGame:
 
                 while self.game_status == IN_GAME:
                     
-                    player1_txt = dialogue_font.render('Player 1', True, color.BLACK)
-                    player2_txt = dialogue_font.render('Player 2', True, color.BLACK)
-                    player1_score = dialogue_font.render(str(int(self.p1_energy)) + ' watts', True, color.BLACK)
-                    player2_score = dialogue_font.render(str(int(self.p2_energy)) + ' watts', True, color.BLACK)
+                    # player1_txt = dialogue_font.render('Player 1', True, color.BLACK)
+                    # player2_txt = dialogue_font.render('Player 2', True, color.BLACK)
+                    # player1_score = dialogue_font.render(str(int(self.p1_energy)) + ' watts', True, color.BLACK)
+                    # player2_score = dialogue_font.render(str(int(self.p2_energy)) + ' watts', True, color.BLACK)
                     
-                    player1_txt_rect = player1_txt.get_rect(center=(int(width/4), int(height/2)+100))
-                    player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)+100))
+                    # player1_txt_rect = player1_txt.get_rect(center=(int(width/4), int(height/2)+100))
+                    # player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4), int(height/2)+100))
 
-                    player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 200))
-                    player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 200))
+                    # player1_score_rect = player1_score.get_rect(center=(int(width/4), int(height/2) + 200))
+                    # player2_score_rect = player2_score.get_rect(center=(int(3*width/4), int(height/2) + 200))
 
                     go_txt = dialogue_font.render("GO!", True, color.BLACK)
-                    go_txt_rect = go_txt.get_rect(center=(int(width/2), int(height/4)))
+                    go_txt_rect = go_txt.get_rect(center=(int(width/2), int(height/2) -200))
 
                     # game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
                     # time_rect = game_time.get_rect(center=(int(width/2)-60, int(height/4)+100))
@@ -314,14 +314,14 @@ class KineticTowerGame:
                     game_win = dialogue_font.render(f"Generate the energy required", True, color.BLACK)
                     game_win2 = dialogue_font.render(f"without going over", True, color.BLACK)
 
-                    game_win_rect = game_win.get_rect(center=(int(width/2), int(height/4)+150))
-                    game_win2_rect = game_win2.get_rect(center=(int(width/2), int(height/4)+200))
+                    game_win_rect = game_win.get_rect(center=(int(width/2), int(height/2)))
+                    game_win2_rect = game_win2.get_rect(center=(int(width/2), int(height/2)+100))
 
 
                     screen.fill(color.GREEN)
                     screen.blit(adi_logo, adi_logo_rect)
-                    screen.blit(player1_txt, player1_txt_rect)
-                    screen.blit(player2_txt, player2_txt_rect)
+                    # screen.blit(player1_txt, player1_txt_rect)
+                    # screen.blit(player2_txt, player2_txt_rect)
                     screen.blit(go_txt, go_txt_rect)
                     # screen.blit(game_time, time_rect)
                     screen.blit(game_win, game_win_rect)
@@ -329,22 +329,22 @@ class KineticTowerGame:
                     pygame.display.update()
                     while self.game_status == IN_GAME:
                         screen.fill(color.GREEN)
-                        player1_score = dialogue_font.render(str(int(self.p1_energy)) + ' watts', True, color.BLACK)
-                        player2_score = dialogue_font.render(str(int(self.p2_energy)) + ' watts', True, color.BLACK)
+                        # player1_score = dialogue_font.render(str(int(self.p1_energy)) + ' watts', True, color.BLACK)
+                        # player2_score = dialogue_font.render(str(int(self.p2_energy)) + ' watts', True, color.BLACK)
                         # game_time = dialogue_font.render(str(round(self.game_time,2)), True, color.BLACK)
                         screen.fill(color.GREEN)
                         screen.blit(adi_logo, adi_logo_rect)
-                        screen.blit(player1_txt, player1_txt_rect)
-                        screen.blit(player2_txt, player2_txt_rect)
-                        p1_screen = screen.blit(player1_score, player1_score_rect)
-                        p2_screen = screen.blit(player2_score, player2_score_rect)
-                        screen.blit(player2_txt, player2_txt_rect)
+                        # screen.blit(player1_txt, player1_txt_rect)
+                        # screen.blit(player2_txt, player2_txt_rect)
+                        # p1_screen = screen.blit(player1_score, player1_score_rect)
+                        # p2_screen = screen.blit(player2_score, player2_score_rect)
+                        # screen.blit(player2_txt, player2_txt_rect)
                         screen.blit(go_txt, go_txt_rect)
                         # screen.blit(game_time, time_rect)
                         screen.blit(game_win, game_win_rect)
                         screen.blit(game_win2, game_win2_rect)
-                        screen.blit(player1_score, player1_score_rect)
-                        screen.blit(player2_score, player2_score_rect)
+                        # screen.blit(player1_score, player1_score_rect)
+                        # screen.blit(player2_score, player2_score_rect)
                 
                         # screens = [p1_screen, p2_screen]
                         pygame.display.update()
@@ -358,21 +358,40 @@ class KineticTowerGame:
                     time.sleep(0.5)
                     # print("Showing Results GUI")
                     winner_txt = dialogue_font.render('Winner:', True, color.BLACK)
-                    winner_txt_rect = winner_txt.get_rect(center=(int(width/2), int(height/4)))
+                    winner_txt_rect = winner_txt.get_rect(center=(int(width/2), int(height/2)-400))
 
                     winner_name = dialogue_font.render(game.winner, True, color.BLACK)
-                    winner_name_rect = winner_name.get_rect(center=(int(width/2), int(height/4) + 100))
+                    winner_name_rect = winner_name.get_rect(center=(int(width/2), int(height/2) -300))
+
+                    player1_txt = dialogue_font.render('Player 1', True, color.BLACK)
+                    player2_txt = dialogue_font.render('Player 2', True, color.BLACK)
+                    player1_score = dialogue_font.render(str(int(self.p1_energy)) + ' watts', True, color.BLACK)
+                    player2_score = dialogue_font.render(str(int(self.p2_energy)) + ' watts', True, color.BLACK)
+                    
+                    player1_txt_rect = player1_txt.get_rect(center=(int(width/4) -100, int(height/2) + 150))
+                    player2_txt_rect = player2_txt.get_rect(center=(int(3*width/4) +100, int(height/2) +150))
+
+                    player1_score_rect = player1_score.get_rect(center=(int(width/4) -100, int(height/2) +250))
+                    player2_score_rect = player2_score.get_rect(center=(int(3*width/4) +100, int(height/2) +250))
+                      
 
                     score_txt = dialogue_font.render('Winning Margin:', True, color.BLACK)
-                    score_txt_rect = score_txt.get_rect(center=(int(width/2), int(height/2)))
+                    score_txt_rect = score_txt.get_rect(center=(int(width/2), int(height/2) -100))
 
                     score_value = dialogue_font.render(str(round(winning_margin, 2)) + ' watts', True, color.BLACK)
-                    score_value_rect = score_value.get_rect(center=(int(width/2), int(height/2) + 100))
+                    score_value_rect = score_value.get_rect(center=(int(width/2), int(height/2)))
+
+                    player1_score = dialogue_font.render(str(int(self.p1_energy)) + ' watts', True, color.BLACK)
+                    player2_score = dialogue_font.render(str(int(self.p2_energy)) + ' watts', True, color.BLACK)
 
                     screen.fill(color.GREEN)
                     screen.blit(adi_logo, adi_logo_rect)
                     screen.blit(winner_txt, winner_txt_rect)
                     screen.blit(winner_name, winner_name_rect)
+                    screen.blit(player1_txt, player1_txt_rect)
+                    screen.blit(player2_txt, player2_txt_rect)
+                    screen.blit(player1_score, player1_score_rect)
+                    screen.blit(player2_score, player2_score_rect)
                     screen.blit(score_txt, score_txt_rect)
                     screen.blit(score_value, score_value_rect)
                     
